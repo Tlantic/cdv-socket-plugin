@@ -22,7 +22,8 @@
         <config-file target="AndroidManifest.xml" parent="/manifest">
             <uses-permission android:name="android.permission.INTERNET" />
         </config-file>        
-        <source-file src="src/android/*.java" target-dir="src/com/tlantic/plugins/socket" />      
+        <source-file src="src/android/SocketPlugin.java" target-dir="src/com/tlantic/plugins/socket" />      
+        <source-file src="src/android/Connection.java" target-dir="src/com/tlantic/plugins/socket" />      
     </platform> 
 
 </plugin>
