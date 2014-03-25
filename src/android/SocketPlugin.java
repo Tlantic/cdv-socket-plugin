@@ -1,5 +1,6 @@
 package com.tlantic.plugins.socket;
 
+import android.annotation.SuppressLint;
 import java.io.IOException;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -37,7 +38,8 @@ public class SocketPlugin extends CordovaPlugin {
 			return false;
 		}
 	}
-	
+
+	@SuppressLint("DefaultLocale")
 	private String buildKey(String host, int port) {
 		return (host.toLowerCase() + ":" + port);
 	}
@@ -63,25 +65,15 @@ public class SocketPlugin extends CordovaPlugin {
 				
 				// creating connection
 				socket = new Connection(host, port);
-				
-				// checking connection
-				if (socket.isConnected()) {
-					// adding to pool
-					this.pool.put(key, socket);
-					callbackContext.success("Established connection with " + key);
-				} else {
-					callbackContext.error("Unable to establish connection with " + key);
-				}
-				
+				socket.start();
+
+				// adding to pool
+				this.pool.put(key, socket);
+				callbackContext.success("Established connection with " + key);
+
 			} catch (JSONException e) {
 				callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
-				
-			} catch (UnknownHostException e) {
-				callbackContext.error("Unable to connect because the host is unknown: " + e.getMessage());
-				
-			} catch (IOException e) {
-				callbackContext.error("Unexpected error when establishing connection: " + e.getMessage());	
-			}
+			} 
 		}
 	}
 	
@@ -110,7 +102,13 @@ public class SocketPlugin extends CordovaPlugin {
 				
 				// closing socket
 				if (socket != null) {
-					socket.close();
+					
+					// checking connection
+					if (socket.isConnected()) {
+						socket.close();
+					}
+					
+					// removing from pool
 					pool.remove(key);
 				}
 				

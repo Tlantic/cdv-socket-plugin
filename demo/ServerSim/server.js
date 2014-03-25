@@ -16,7 +16,6 @@ onConnect = function (socket) {
 	console.log('- Connection from ', socket.remoteAddress, ' on port ', socket.localPort, ' established.');
 };
 
-
 serverInstance = function (socket) {
 	'use strict';
 
@@ -33,6 +32,7 @@ serverInstance = function (socket) {
 
 	// Remove client from list
 	socket.on('end', function () {
+		console.log('- Client has been disconnected from server... ');
 		clients.splice(clients.indexOf(socket), 1);
 	});
 
