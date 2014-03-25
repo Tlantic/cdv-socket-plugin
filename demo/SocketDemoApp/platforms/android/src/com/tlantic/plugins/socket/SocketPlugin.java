@@ -1,11 +1,12 @@
 package com.tlantic.plugins.socket;
 
 import android.annotation.SuppressLint;
-import java.io.IOException;
-import java.net.Socket;
-import java.net.UnknownHostException;
+
 import java.util.HashMap;
+import java.util.Iterator;
 import java.util.Map;
+import java.util.Map.Entry;
+
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
@@ -15,7 +16,6 @@ public class SocketPlugin extends CordovaPlugin {
 
 	private Map<String, Connection> pool = new HashMap<String,Connection>();
 
-
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
@@ -24,6 +24,7 @@ public class SocketPlugin extends CordovaPlugin {
 			return true;
 
 		}else if(action.equals("send")) {
+			this.send(args, callbackContext);
 			return true;
 
 		} else if (action.equals("disconnect")) {
@@ -31,6 +32,7 @@ public class SocketPlugin extends CordovaPlugin {
 			return true;
 
 		} else if (action.equals("disconnectAll")) {
+			this.disconnectAll(callbackContext);
 			return true;
 
 		}  else {
@@ -41,6 +43,11 @@ public class SocketPlugin extends CordovaPlugin {
 	@SuppressLint("DefaultLocale")
 	private String buildKey(String host, int port) {
 		return (host.toLowerCase() + ":" + port);
+	}
+	
+	private Connection getSocket(String host, int port) {
+		String key = this.buildKey(host, port);
+		return this.pool.get(key);
 	}
 
 	private void connect (JSONArray args, CallbackContext callbackContext) {
@@ -63,7 +70,7 @@ public class SocketPlugin extends CordovaPlugin {
 				key = this.buildKey(host, port);
 
 				// creating connection
-				socket = new Connection(host, port);
+				socket = new Connection(this, host, port);
 				socket.start();
 
 				// adding to pool
@@ -76,7 +83,25 @@ public class SocketPlugin extends CordovaPlugin {
 		}
 	}
 
-	private void send() {
+	private void send(JSONArray args, CallbackContext callbackContext) {
+		Connection socket;
+		
+		// validating parameters
+		if (args.length() < 3) {
+			callbackContext.error("Missing arguments when calling 'send' action.");
+		} else {
+			try {
+				// getting socket and writting on output stream
+				socket = this.getSocket(args.getString(0), args.getInt(1));
+				socket.write(args.getString(2));
+				
+				// ending send process
+				callbackContext.success();
+				
+			} catch (JSONException e) {
+				callbackContext.error("Unexpected error sending information: " + e.getMessage());
+			}
+		}
 	}
 
 	private void disconnect (JSONArray args, CallbackContext callbackContext) {
@@ -120,6 +145,43 @@ public class SocketPlugin extends CordovaPlugin {
 		}		
 	}
 
-	private void disconnectAll () {
+	private void disconnectAll (CallbackContext callbackContext) {
+		// building iterator
+		Iterator<Entry<String, Connection>> it = this.pool.entrySet().iterator();
+		
+		while( it.hasNext() ) {
+			
+			// retrieving object
+			Map.Entry<String, Connection> pairs = (Entry<String, Connection>) it.next();
+			Connection socket = pairs.getValue();
+			
+			// checking connection
+			if (socket.isConnected()) {
+				socket.close();
+			}
+			
+			// removing from pool
+			this.pool.remove(pairs.getKey());
+		}
+		
+		callbackContext.success("All connections were closed.");
 	}
+
+	/*
+	 * 
+	 */
+	public synchronized void sendMessage(String host, int port, String chunk) {
+		final String receiveHook = "window.tlantic.plugins.socket.receive('" + host + "'," + port + ",'" + chunk + "');";
+		
+		cordova.getActivity().runOnUiThread(new Runnable() {
+
+			@Override
+			public void run() {
+				// TODO Auto-generated method stub
+				webView.loadUrl("javascript:" + receiveHook);
+			}
+			
+		});
+	}
+	
 }

@@ -35,8 +35,9 @@
             </div>
             <div>
             	<br>
-            	<p class="event" onclick="connect()">Connect</p><br>
-            	<p class="event" onclick="disconnect()">Disconnect</p><br>
+            	<button onclick="connect()">Connect</button><br><br>
+            	<button onclick="send()">Send</button><br><br>
+            	<button onclick="disconnect()">Disconnect</button><br><br>
             </div>
         </div>
         <script type="text/javascript" src="cordova.js"></script>
@@ -45,7 +46,8 @@
             app.initialize();
             
             var host = "10.56.0.26",
-            	port = 18002;
+            	port = 18002,
+            	data = "This is my fake data";
             
             function stub(d) {
             	console.log(d);
@@ -55,9 +57,17 @@
             	window.tlantic.plugins.socket.connect(stub, stub, host, port);
             }
             
+            function send() {
+            	window.tlantic.plugins.socket.send(stub, stub, host, port, data);
+            }
+            
             function disconnect() {
             	window.tlantic.plugins.socket.disconnect(stub, stub, host, port);
             }
+            
+            document.addEventListener('SOCKET_RECEIVE_DATA_HOOK', function (ev) {
+            	window.alert(ev.metadata.data);
+            });
         </script>
     </body>
 </html>

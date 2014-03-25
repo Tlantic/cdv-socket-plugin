@@ -16,6 +16,7 @@ onConnect = function (socket) {
 	console.log('- Connection from ', socket.remoteAddress, ' on port ', socket.localPort, ' established.');
 };
 
+
 serverInstance = function (socket) {
 	'use strict';
 
@@ -27,7 +28,9 @@ serverInstance = function (socket) {
 
 	// handle incoming messages
 	socket.on('data', function (data) {
-		console.log('- Received information on port ', socket.localPort, ': ', data);
+		console.log('- Received information on port ', socket.localPort, ': ', data.toString('utf-8'));
+		console.log('- Replied to ' + socket.name);
+		socket.write('This is my answer: ' + Date.now().toString() + '\n');
 	});
 
 	// Remove client from list
