@@ -6,10 +6,12 @@ import java.io.InputStreamReader;
 import java.io.PrintWriter;
 import java.net.Socket;
 
-import org.apache.cordova.CordovaWebView;
 
-/*
- * 
+/**
+ * @author viniciusl
+ *
+ * This class represents a socket connection, behaving like a thread to listen 
+ * a TCP port and receive data
  */
 public class Connection extends Thread {
 	private SocketPlugin hook;
@@ -22,8 +24,13 @@ public class Connection extends Thread {
 	private String host;
 	private int port;
 	
-	/*
+	
+	/**
+	 * Creates a TCP socket connection object.
 	 * 
+	 * @param pool Object containing "sendMessage" method to be called as a callback for data receive.
+	 * @param host Target host for socket connection.
+	 * @param port Target port for socket connection
 	 */
 	public Connection(SocketPlugin pool, String host, int port) {
 		super();
@@ -35,29 +42,38 @@ public class Connection extends Thread {
 		this.hook = pool;
 	}
 	
-	/*
+
+	/**
+	 * Returns socket connection state.
 	 * 
+	 * @return true if socket connection is established or false case else.
 	 */
 	public boolean isConnected() {
 		return this.callbackSocket.isConnected();
 	}
 	
-	/*
-	 * 
+
+	/**
+	 * Closes socket connection. 
 	 */
 	public void close() {
 		this.mustClose = true;
 	}
 	
-	/*
+	
+	/**
+	 * Writes on socket output stream to send data to target host.
 	 * 
+	 * @param data information to be sent
 	 */
 	public void write(String data) {
 		this.writer.println(data);
 	}
 	
-	/*
-	 * 
+
+
+	/* (non-Javadoc)
+	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
 		String chunk = null;

@@ -28,11 +28,14 @@ serverInstance = function (socket) {
 
 	// handle incoming messages
 	socket.on('data', function (data) {
-		console.log('- Received information on port ', socket.localPort, ': ', data);
+		console.log('- Received information on port ', socket.localPort, ': ', data.toString('utf-8'));
+		console.log('- Replied to ' + socket.name);
+		socket.write('This is my answer: ' + Date.now().toString() + '\n');
 	});
 
 	// Remove client from list
 	socket.on('end', function () {
+		console.log('- Client has been disconnected from server... ');
 		clients.splice(clients.indexOf(socket), 1);
 	});
 

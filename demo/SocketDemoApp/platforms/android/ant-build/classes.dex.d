@@ -1,5 +1,6 @@
 D:\github\tlantic\cdv-socket-plugin\demo\SocketDemoApp\platforms\android\ant-build\classes.dex : \
 D:\github\tlantic\cdv-socket-plugin\demo\SocketDemoApp\platforms\android\ant-build\classes\com\tlantic\plugins\socket\Connection.class \
+D:\github\tlantic\cdv-socket-plugin\demo\SocketDemoApp\platforms\android\ant-build\classes\com\tlantic\plugins\socket\SocketPlugin$1.class \
 D:\github\tlantic\cdv-socket-plugin\demo\SocketDemoApp\platforms\android\ant-build\classes\com\tlantic\plugins\socket\SocketPlugin.class \
 D:\github\tlantic\cdv-socket-plugin\demo\SocketDemoApp\platforms\android\ant-build\classes\com\tlantic\socketdemo\BuildConfig.class \
 D:\github\tlantic\cdv-socket-plugin\demo\SocketDemoApp\platforms\android\ant-build\classes\com\tlantic\socketdemo\R$attr.class \

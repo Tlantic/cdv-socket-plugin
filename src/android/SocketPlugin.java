@@ -12,10 +12,22 @@ import org.apache.cordova.CordovaPlugin;
 import org.json.JSONArray;
 import org.json.JSONException;
 
+/**
+ * @author viniciusl
+ *
+ * Plugin to handle TCP socket connections.	
+ */
+/**
+ * @author viniciusl
+ *
+ */
 public class SocketPlugin extends CordovaPlugin {
 
-	private Map<String, Connection> pool = new HashMap<String,Connection>();
+	private Map<String, Connection> pool = new HashMap<String,Connection>();		// pool of "active" connections
 
+	/* (non-Javadoc)
+	 * @see org.apache.cordova.CordovaPlugin#execute(java.lang.String, org.json.JSONArray, org.apache.cordova.CallbackContext)
+	 */
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
@@ -40,16 +52,36 @@ public class SocketPlugin extends CordovaPlugin {
 		}
 	}
 
+	/**
+	 * Build a key to identify a socket connection based on host and port information.
+	 * 
+	 * @param host Target host
+	 * @param port Target port
+	 * @return connection key
+	 */
 	@SuppressLint("DefaultLocale")
 	private String buildKey(String host, int port) {
 		return (host.toLowerCase() + ":" + port);
 	}
 	
+	/**
+	 * Returns socket connection object
+	 * 
+	 * @param host Target host
+	 * @param port Target port
+	 * @return socket connection object
+	 */
 	private Connection getSocket(String host, int port) {
 		String key = this.buildKey(host, port);
 		return this.pool.get(key);
 	}
 
+	/**
+	 * Opens a socket connection.
+	 * 
+	 * @param args
+	 * @param callbackContext
+	 */
 	private void connect (JSONArray args, CallbackContext callbackContext) {
 		String key;
 		String host;
@@ -83,6 +115,12 @@ public class SocketPlugin extends CordovaPlugin {
 		}
 	}
 
+	/**
+	 * Send information to target host
+	 * 
+	 * @param args
+	 * @param callbackContext
+	 */
 	private void send(JSONArray args, CallbackContext callbackContext) {
 		Connection socket;
 		
@@ -104,6 +142,12 @@ public class SocketPlugin extends CordovaPlugin {
 		}
 	}
 
+	/**
+	 * Closes an existing connection
+	 * 
+	 * @param args
+	 * @param callbackContext
+	 */
 	private void disconnect (JSONArray args, CallbackContext callbackContext) {
 		String key;
 		String host;
@@ -145,6 +189,11 @@ public class SocketPlugin extends CordovaPlugin {
 		}		
 	}
 
+	/**
+	 * Closes all existing connections
+	 * 
+	 * @param callbackContext
+	 */
 	private void disconnectAll (CallbackContext callbackContext) {
 		// building iterator
 		Iterator<Entry<String, Connection>> it = this.pool.entrySet().iterator();
@@ -167,8 +216,13 @@ public class SocketPlugin extends CordovaPlugin {
 		callbackContext.success("All connections were closed.");
 	}
 
-	/*
+
+	/**
+	 * Callback for Connection object data receive. Relay information to javascript object method: window.tlantic.plugins.socket.receive();
 	 * 
+	 * @param host
+	 * @param port
+	 * @param chunk
 	 */
 	public synchronized void sendMessage(String host, int port, String chunk) {
 		final String receiveHook = "window.tlantic.plugins.socket.receive('" + host + "'," + port + ",'" + chunk + "');";
@@ -177,7 +231,6 @@ public class SocketPlugin extends CordovaPlugin {
 
 			@Override
 			public void run() {
-				// TODO Auto-generated method stub
 				webView.loadUrl("javascript:" + receiveHook);
 			}
 			
