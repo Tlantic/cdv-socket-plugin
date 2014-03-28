@@ -28,4 +28,7 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    <feature name="Socket">
+        <param name="ios-package" value="CDVSocketPlugin" />
+    </feature>
 </widget>

@@ -13,4 +13,7 @@
     </author>
     <content src="index.html" />
     <access origin="*" />
+    <feature name="Socket">
+        <param name="android-package" value="com.tlantic.plugins.socket.SocketPlugin" />
+    </feature>
 </widget>
