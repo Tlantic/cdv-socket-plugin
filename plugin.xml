@@ -2,7 +2,7 @@
 <plugin xmlns="http://apache.org/cordova/ns/plugins/1.0"
     xmlns:android="http://schemas.android.com/apk/res/android"
     id="com.tlantic.plugins.socket"
-    version="0.1.0">
+    version="0.2.0">
     <name>Socket</name>
     <description>Tlantic TCP socket plugin</description>
     <license>GPL</license>
@@ -24,6 +24,20 @@
         </config-file>        
         <source-file src="src/android/SocketPlugin.java" target-dir="src/com/tlantic/plugins/socket" />      
         <source-file src="src/android/Connection.java" target-dir="src/com/tlantic/plugins/socket" />      
-    </platform> 
+    </platform>
+
+    <!-- ios -->
+    <platform name="ios">
+        <config-file target="config.xml" parent="/*">
+            <feature name="Socket">
+                <param name="ios-package" value="CDVSocketPlugin" />
+            </feature>
+        </config-file>
+
+        <header-file src="src/ios/Connection.h" />
+
+        <source-file src="src/ios/CDVSocketPlugin.mm" compiler-flags="-fno-objc-arc" />
+        <source-file src="src/ios/Connection.cpp" />
+    </platform>
 
 </plugin>
