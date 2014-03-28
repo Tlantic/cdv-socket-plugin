@@ -4,11 +4,8 @@
         "uninstalled": []
     },
     "config_munge": {
-        "res/xml/config.xml": {
+        "config.xml": {
             "/*": {}
-        },
-        "AndroidManifest.xml": {
-            "/manifest": {}
         }
     },
     "installed_plugins": {},
