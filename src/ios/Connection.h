@@ -1,9 +1,15 @@
-@interface Connection : NSObject {
+@interface Connection : NSObject <NSStreamDelegate> {
+    @private
+    
     NSString *host;
-    NSInteger *port;
-    CFReadStreamRef *reader;
-    CFWriteStreamRef *writer;
+    int port;
+
+    CFReadStreamRef reader;
+    CFWriteStreamRef writer;
 }
 
-- (id)init :(NSString*)targetHost :(NSInteger*)targetPort;
+- (id)initWithNetworkAddress :(NSString*)targetHost :(int)targetPort;
+- (Boolean)open;
+- (void)close;
+- (void)write :(NSString*)data;
 @end

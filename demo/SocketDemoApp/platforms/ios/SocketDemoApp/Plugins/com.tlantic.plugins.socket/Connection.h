@@ -4,15 +4,12 @@
     NSString *host;
     int port;
 
-    CFReadStreamRef readStream;
-    CFWriteStreamRef writeStream;
-    
-    NSInputStream* inputStream;
-    NSOutputStream* outputStream;
+    CFReadStreamRef reader;
+    CFWriteStreamRef writer;
 }
 
 - (id)initWithNetworkAddress :(NSString*)targetHost :(int)targetPort;
-- (void)open;
+- (Boolean)open;
 - (void)close;
 - (void)write :(NSString*)data;
 @end

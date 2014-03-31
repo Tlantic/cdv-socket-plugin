@@ -12,49 +12,35 @@
     return self;
 }
 
-- (void)open {
-    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)self->host, self->port, &readStream, &writeStream);
+- (Boolean)open {
     
-    self->inputStream = (__bridge_transfer NSInputStream *)readStream;
-    [self->inputStream setDelegate:self];
-    [self->inputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self->inputStream open];
+    // opening connection
+    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)self->host, self->port, &reader, &writer);
+    [NSThread sleepForTimeInterval:2]; //Delay
     
-    self->outputStream = (__bridge NSOutputStream *)writeStream;
-    [self->outputStream setDelegate:self];
-    [self->outputStream scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self->outputStream open];
+    // configuring to close native socket
+    CFReadStreamSetProperty(reader, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanTrue);
+    CFWriteStreamSetProperty(writer, kCFStreamPropertyShouldCloseNativeSocket, kCFBooleanTrue);
+    
+    // returning opening status
+    return CFWriteStreamOpen(writer);
 }
 
 - (void)close {
     
-    
-    // closing-releasing input stream
-    [self->inputStream close];
-    [self->inputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self->inputStream setDelegate:nil];
-    self->inputStream = nil;
-    
-    // closing-releasing output  stream
-    [self->outputStream close];
-    [self->outputStream removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
-    [self->outputStream setDelegate:nil];
-    self->outputStream = nil;
-    
-    
     // closing-releasing CF Read Streams
-    CFReadStreamClose(self->readStream);
-    if (readStream) CFRelease(self->readStream);
+    CFReadStreamClose(self->reader);
+    CFRelease(self->reader);
     
     // closing-releasing CF Write Stream
-    CFWriteStreamClose(self->writeStream);
-    if (writeStream) CFRelease(self->writeStream);
+    CFWriteStreamClose(self->writer);
+    CFRelease(self->writer);
 }
 
 
 - (void)write :(NSString *)data {
-	NSData *chunk = [[NSData alloc] initWithData:[data dataUsingEncoding:NSASCIIStringEncoding]];
-	[self->outputStream write:[chunk bytes] maxLength:[chunk length]];
+    int bytes = CFWriteStreamWrite(writer, (const UInt8 *)[data UTF8String], [data lengthOfBytesUsingEncoding:NSUTF8StringEncoding]);
+    NSLog(@"Bytes written on output stream: %d", bytes);
 }
 
 

@@ -6,5 +6,6 @@
 
 -(void) connect: (CDVInvokedUrlCommand *) command;
 -(void) disconnect: (CDVInvokedUrlCommand *) command;
+-(void) send: (CDVInvokedUrlCommand *) command;
 
 @end

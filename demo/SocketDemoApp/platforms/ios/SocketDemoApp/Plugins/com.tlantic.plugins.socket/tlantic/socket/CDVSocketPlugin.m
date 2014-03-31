@@ -5,18 +5,6 @@
 @implementation CDVSocketPlugin
 
 
-
-- (id)init {
-    self = [super init];
-    
-    if (self) {
-        self->pool = [[NSMutableDictionary alloc] init];
-    }
-    return self;
-}
-
-
-
 - (NSString*)buildKey :(NSString*)host :(int)port {
     NSString* tempHost = [host lowercaseString];
     NSString* tempPort = [NSString stringWithFormat:@"%d", port];
@@ -28,7 +16,6 @@
 
 - (void)connect:(CDVInvokedUrlCommand*)command
 {
-    
     // validating parameters
     if ([command.arguments count] < 2) {
         
@@ -37,6 +24,12 @@
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
         
     } else {
+        
+        // checking connection pool
+        if (!pool) {
+            self->pool = [[NSMutableDictionary alloc] init];
+        }
+        
         
         // running in background to avoid thread locks
         [self.commandDelegate runInBackground:^{
@@ -55,17 +48,28 @@
                 port = [[command.arguments objectAtIndex:1] integerValue];
                 key = [self buildKey:host :port];
                 
-                // creating connection
-                socket = [[Connection alloc] initWithNetworkAddress:host :port];
-                [socket open];
-                
-                // adding to pool
-                [pool setObject:socket forKey:key];
-                
-                //formatting success response
-                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
-                NSLog(@"Established connection with %@", key);
-                
+                // checking existing connections
+                if ([pool objectForKey:key]) {
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
+                    NSLog(@"Recovered connection with %@", key);
+                } else {
+                    
+                    // creating connection
+                    socket = [[Connection alloc] initWithNetworkAddress:host :port];
+                    
+                    // testing socket connection
+                    if (![socket open]) {
+                        NSLog(@"Unable to open connection to %@", key);
+                        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Error when trying to open TCP connection."];
+                    } else {
+                        // adding to pool
+                        [self->pool setObject:socket forKey:key];
+                        
+                        //formatting success response
+                        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
+                        NSLog(@"Established connection with %@", key);
+                    }
+                }
             }
             @catch (NSException *exception) {
                 NSLog(@"Exception: %@", exception);
@@ -111,12 +115,14 @@
                 
                 // closing connection
                 if (socket) {
+                    [pool removeObjectForKey:key];
                     [socket close];
+                    socket = nil;
                 }
                 
                 //formatting success response
+                NSLog(@"Closed connection with %@", key);
                 result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
-                NSLog(@"Closing connection with %@", key);
             }
             @catch (NSException *exception) {
                 NSLog(@"Exception: %@", exception);
