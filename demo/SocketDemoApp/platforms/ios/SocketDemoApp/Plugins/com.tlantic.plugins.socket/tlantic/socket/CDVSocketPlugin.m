@@ -56,19 +56,14 @@
                     
                     // creating connection
                     socket = [[Connection alloc] initWithNetworkAddress:host :port];
+                    [socket open];
                     
-                    // testing socket connection
-                    if (![socket open]) {
-                        NSLog(@"Unable to open connection to %@", key);
-                        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Error when trying to open TCP connection."];
-                    } else {
-                        // adding to pool
-                        [self->pool setObject:socket forKey:key];
-                        
-                        //formatting success response
-                        result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
-                        NSLog(@"Established connection with %@", key);
-                    }
+                    // adding to pool
+                    [self->pool setObject:socket forKey:key];
+                    
+                    //formatting success response
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
+                    NSLog(@"Established connection with %@", key);
                 }
             }
             @catch (NSException *exception) {
