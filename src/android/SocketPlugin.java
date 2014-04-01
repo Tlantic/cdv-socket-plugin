@@ -102,12 +102,14 @@ public class SocketPlugin extends CordovaPlugin {
 				key = this.buildKey(host, port);
 
 				// creating connection
-				socket = new Connection(this, host, port);
-				socket.start();
+				if (this.pool.get(key) == null) {
+					socket = new Connection(this, host, port);
+					socket.start();
+					this.pool.put(key, socket);
+				}
 
 				// adding to pool
-				this.pool.put(key, socket);
-				callbackContext.success("Established connection with " + key);
+				callbackContext.success(key);
 
 			} catch (JSONException e) {
 				callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
