@@ -38,6 +38,7 @@
             	<button onclick="connect()">Connect</button><br><br>
             	<button onclick="send()">Send</button><br><br>
             	<button onclick="disconnect()">Disconnect</button><br><br>
+                <button onclick="disconnectAll()">DisconnectAll</button><br><br>
             </div>
         </div>
         <script type="text/javascript" src="cordova.js"></script>
@@ -64,7 +65,11 @@
             function disconnect() {
             	window.tlantic.plugins.socket.disconnect(stub, stub, host, port);
             }
-            
+        
+            function disconnectAll() {
+                window.tlantic.plugins.socket.disconnectAll(stub, stub);
+            }
+        
             document.addEventListener('SOCKET_RECEIVE_DATA_HOOK', function (ev) {
             	window.alert(ev.metadata.data);
             });

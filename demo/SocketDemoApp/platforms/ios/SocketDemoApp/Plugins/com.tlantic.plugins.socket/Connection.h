@@ -9,14 +9,12 @@
 
 @interface Connection : NSObject <NSStreamDelegate> {
 @private
-    
-    NSString *host;
-    int port;
-    
     NSInputStream *reader;
     NSOutputStream *writer;
 }
 
+@property NSString *host;
+@property int port;
 
 @property (nonatomic, weak) id<ConnectionDelegate> hook;
 

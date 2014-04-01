@@ -37,8 +37,8 @@
         <header-file src="src/ios/CDVSocketPlugin.h" />
         <header-file src="src/ios/Connection.h" />
 
-        <source-file src="src/ios/CDVSocketPlugin.m" target-dir="tlantic/socket" />
-        <source-file src="src/ios/Connection.m" target-dir="tlantic/socket" />
+        <source-file src="src/ios/CDVSocketPlugin.m" />
+        <source-file src="src/ios/Connection.m"  />
     </platform>
 
 </plugin>

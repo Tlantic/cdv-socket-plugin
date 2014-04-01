@@ -7,8 +7,8 @@
     self = [super init];
     if (self)
     {
-        self->host = targetHost;
-        self->port = targetPort;
+        _host = targetHost;
+        _port = targetPort;
     }
     return self;
 }
@@ -24,7 +24,7 @@
     CFWriteStreamRef writeStream;
     
     // opening connection
-    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)self->host, self->port, &readStream, &writeStream);
+    CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)_host, _port, &readStream, &writeStream);
     
     // configuring input stream
     reader = objc_retainedObject(readStream);
@@ -85,7 +85,7 @@
                         
                         if (nil != chunk) {
                             NSLog(@"Received data: %@", chunk);
-                            [_hook sendMessage:host :port :chunk];
+                            [_hook sendMessage:_host :_port :chunk];
                         }
                     }
                 }

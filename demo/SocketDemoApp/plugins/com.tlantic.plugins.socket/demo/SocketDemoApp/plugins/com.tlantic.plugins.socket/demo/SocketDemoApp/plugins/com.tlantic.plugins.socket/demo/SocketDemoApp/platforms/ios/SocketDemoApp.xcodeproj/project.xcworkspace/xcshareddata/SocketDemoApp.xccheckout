@@ -1,0 +1,41 @@
+<?xml version="1.0" encoding="UTF-8"?>
+<!DOCTYPE plist PUBLIC "-//Apple//DTD PLIST 1.0//EN" "http://www.apple.com/DTDs/PropertyList-1.0.dtd">
+<plist version="1.0">
+<dict>
+	<key>IDESourceControlProjectFavoriteDictionaryKey</key>
+	<false/>
+	<key>IDESourceControlProjectIdentifier</key>
+	<string>6D7BDDEA-38A8-43CC-BD29-0FF7933B8D5F</string>
+	<key>IDESourceControlProjectName</key>
+	<string>SocketDemoApp</string>
+	<key>IDESourceControlProjectOriginsDictionary</key>
+	<dict>
+		<key>D73779F7-DE21-4DAA-B63D-83A89D78CBBE</key>
+		<string>https://github.com/tlantic/cdv-socket-plugin</string>
+	</dict>
+	<key>IDESourceControlProjectPath</key>
+	<string>demo/SocketDemoApp/platforms/ios/SocketDemoApp.xcodeproj/project.xcworkspace</string>
+	<key>IDESourceControlProjectRelativeInstallPathDictionary</key>
+	<dict>
+		<key>D73779F7-DE21-4DAA-B63D-83A89D78CBBE</key>
+		<string>../../../../../..</string>
+	</dict>
+	<key>IDESourceControlProjectURL</key>
+	<string>https://github.com/tlantic/cdv-socket-plugin</string>
+	<key>IDESourceControlProjectVersion</key>
+	<integer>110</integer>
+	<key>IDESourceControlProjectWCCIdentifier</key>
+	<string>D73779F7-DE21-4DAA-B63D-83A89D78CBBE</string>
+	<key>IDESourceControlProjectWCConfigurations</key>
+	<array>
+		<dict>
+			<key>IDESourceControlRepositoryExtensionIdentifierKey</key>
+			<string>public.vcs.git</string>
+			<key>IDESourceControlWCCIdentifierKey</key>
+			<string>D73779F7-DE21-4DAA-B63D-83A89D78CBBE</string>
+			<key>IDESourceControlWCCName</key>
+			<string>cdv-socket-plugin</string>
+		</dict>
+	</array>
+</dict>
+</plist>

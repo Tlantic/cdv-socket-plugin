@@ -1,0 +1,13 @@
+{
+    "prepare_queue": {
+        "installed": [],
+        "uninstalled": []
+    },
+    "config_munge": {
+        "config.xml": {
+            "/*": {}
+        }
+    },
+    "installed_plugins": {},
+    "dependent_plugins": {}
+}
