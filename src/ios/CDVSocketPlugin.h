@@ -1,6 +1,7 @@
 #import <Cordova/CDV.h>
+#import "Connection.h"
 
-@interface CDVSocketPlugin : CDVPlugin {
+@interface CDVSocketPlugin : CDVPlugin <ConnectionDelegate> {
     NSMutableDictionary *pool;
 }
 

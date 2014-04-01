@@ -56,6 +56,7 @@
                     
                     // creating connection
                     socket = [[Connection alloc] initWithNetworkAddress:host :port];
+                    [socket setDelegate:self];
                     [socket open];
                     
                     // adding to pool
@@ -181,5 +182,12 @@
         
         
     }
+}
+
+-(void) sendMessage :(NSString *)host :(int)port :(NSString *)data {
+    
+    NSString *receiveHook= [NSString stringWithFormat:@"window.tlantic.plugins.socket.receive('%@', %d, '%@' );", host, port, data];
+    [self writeJavascript:receiveHook];
+    
 }
 @end

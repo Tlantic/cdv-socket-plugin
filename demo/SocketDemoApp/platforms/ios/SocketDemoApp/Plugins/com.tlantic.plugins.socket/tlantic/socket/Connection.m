@@ -12,6 +12,10 @@
     return self;
 }
 
+- (void)setDelegate:(id<ConnectionDelegate>)callbackRef {
+    _hook = callbackRef;
+}
+
 - (void)open {
     
     // init network communication settings
@@ -80,6 +84,7 @@
                         
                         if (nil != output) {
                             NSLog(@"Received data: %@", output);
+                            [_hook sendMessage:host :port :output];
                         }
                     }
                 }
