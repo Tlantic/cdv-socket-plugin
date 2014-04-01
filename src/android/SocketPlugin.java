@@ -112,8 +112,8 @@ public class SocketPlugin extends CordovaPlugin {
 				callbackContext.success(key);
 
 			} catch (JSONException e) {
-				callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
-			} 
+				callbackContext.error("Invalid parameters for 'connect' action: " + e.getMessage());
+			}
 		}
 	}
 
