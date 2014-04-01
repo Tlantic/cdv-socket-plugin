@@ -8,14 +8,14 @@ Follows the [Cordova Plugin spec](https://github.com/apache/cordova-plugman/blob
 
 ## Cordova/Phonegap Support ##
 
-This plugin was tested and qualified using Cordova 3.4. The demo app contains an Android 4.1.1 app, used for plugin testing.
+This plugin was tested and qualified using Cordova 3.4. The demo app contains implementation for Android and iOS. You can check that out at [demo app repository](https://github.com/Tlantic/SocketPluginDemo)
 
 ## Adding the plugin ##
 
 To add the plugin, just run the following command through cordova CLI:
 
 ```
-cordova plugin add https://github.com/Tlantic/cdv-socket-plugin
+cordova plugin add com.tlantic.plugins.socket
 ```
 
 ## Using the plugin ##

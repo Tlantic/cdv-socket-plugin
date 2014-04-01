@@ -38,7 +38,7 @@
         <header-file src="src/ios/Connection.h" />
 
         <source-file src="src/ios/CDVSocketPlugin.m" />
-        <source-file src="src/ios/Connection.m" />
+        <source-file src="src/ios/Connection.m"  />
     </platform>
 
 </plugin>
