@@ -184,7 +184,7 @@
                 
                 // try close it
                 if (![self disposeConnection:socket.host :socket.port]) {
-                    partial = true;
+                    partial = FALSE;
                 }
             }
             

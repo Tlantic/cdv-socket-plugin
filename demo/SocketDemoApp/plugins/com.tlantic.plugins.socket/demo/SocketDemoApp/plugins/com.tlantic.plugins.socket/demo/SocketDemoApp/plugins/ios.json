@@ -5,9 +5,15 @@
     },
     "config_munge": {
         "config.xml": {
-            "/*": {}
+            "/*": {
+                "<feature name=\"Socket\"><param name=\"ios-package\" value=\"CDVSocketPlugin\" /></feature>": 1
+            }
         }
     },
-    "installed_plugins": {},
+    "installed_plugins": {
+        "com.tlantic.plugins.socket": {
+            "PACKAGE_NAME": "com.tlantic.socketdemo"
+        }
+    },
     "dependent_plugins": {}
 }

@@ -30,7 +30,7 @@ Socket.prototype.disconnectAll = function (successCallback, errorCallback) {
 //
 Socket.prototype.send = function (successCallback, errorCallback, host, port, data) {
     'use strict';
-    exec(successCallback, errorCallback, this.pluginRef, 'send', [host, port, data]);
+    exec(successCallback, errorCallback, this.pluginRef, 'send', [host, port, typeof data == 'string' ? data : JSON.stringify(data)]);
 };
 
 //

@@ -69,7 +69,7 @@
             }
             @catch (NSException *exception) {
                 NSLog(@"Exception: %@", exception);
-                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unexpected exception when executon 'connect' action."];
+                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unexpected exception when executing 'connect' action."];
             }
             
             //returning callback resolution
@@ -80,6 +80,48 @@
     }
     
 }
+
+
+
+-(Boolean) disposeConnection :(NSString *)host :(int)port {
+    
+    NSString *key = nil;
+    Connection* socket = nil;
+    Boolean result = false;
+    
+    
+    @try {
+        // preparing parameters
+        key = [self buildKey:host :port];
+        
+        
+        // getting connection from pool
+        socket = [pool objectForKey:key];
+        
+        // closing connection
+        if (socket) {
+            [pool removeObjectForKey:key];
+            [socket close];
+            socket = nil;
+            
+            NSLog(@"Closed connection with %@", key);
+        } else {
+            NSLog(@"Connection %@ already closed!", key);
+        }
+        
+        // setting success
+        result = true;
+    }
+    @catch (NSException *exception) {
+        NSLog(@"Exception when closing connection: %@", exception);
+        result = false;
+    }
+    @finally {
+        return result;
+    }
+}
+
+
 
 - (void)disconnect:(CDVInvokedUrlCommand*)command
 {
@@ -95,8 +137,6 @@
         [self.commandDelegate runInBackground:^{
             
             CDVPluginResult* result= nil;
-            Connection* socket = nil;
-            NSString* key = nil;
             NSString* host = nil;
             int port = 0;
             
@@ -104,25 +144,19 @@
                 // preparing parameters
                 host = [command.arguments objectAtIndex:0];
                 port = [[command.arguments objectAtIndex:1] integerValue];
-                key = [self buildKey:host :port];
-                
-                // getting connection from pool
-                socket = [pool objectForKey:key];
-                
-                // closing connection
-                if (socket) {
-                    [pool removeObjectForKey:key];
-                    [socket close];
-                    socket = nil;
+
+
+                // closing socket
+                if ([self disposeConnection:host :port]) {
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+                } else {
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unable to close connection!"];
                 }
                 
-                //formatting success response
-                NSLog(@"Closed connection with %@", key);
-                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
             }
             @catch (NSException *exception) {
                 NSLog(@"Exception: %@", exception);
-                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unexpected exception when executon 'disconnect' action."];
+                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unexpected exception when executing 'disconnect' action."];
             }
             
             //returning callback resolution
@@ -130,6 +164,48 @@
         }];
         
     }
+    
+}
+
+-(void) disconnectAll: (CDVInvokedUrlCommand *) command {
+
+    // running in background to avoid thread locks
+    [self.commandDelegate runInBackground:^{
+       
+        CDVPluginResult* result = nil;
+        Connection * socket = nil;
+        Boolean *partial = false;
+        
+        @try {
+            
+            // iterating connection pool
+            for (id key in pool) {
+                socket = [pool objectForKey:key];
+                
+                // try close it
+                if (![self disposeConnection:socket.host :socket.port]) {
+                    partial = true;
+                }
+            }
+            
+            //formatting result
+            if (partial) {
+                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Some connections could not be closed."];
+                
+            } else {
+                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
+            }
+        }
+        @catch (NSException *exception) {
+            NSLog(@"Exception: %@", exception);
+            result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unexpected exception when executing 'disconnectAll' action."];
+        }
+        @finally {
+            //returning callback resolution
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        }
+        
+    }];
     
 }
 
@@ -184,9 +260,6 @@
     }
 }
 
--(void) disconnectAll: (CDVInvokedUrlCommand *) command {
-    
-}
 
 
 
@@ -196,7 +269,7 @@
     NSMutableString *data = [NSMutableString stringWithString:chunk];
     [data replaceOccurrencesOfString:@"\n" withString:@"\\n" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [data length])];
     
-    
+    // relay to webview
     NSString *receiveHook= [NSString stringWithFormat:@"window.tlantic.plugins.socket.receive('%@', %d, '%@' );", host, port, [NSString stringWithString:data]];
     [self writeJavascript:receiveHook];
     

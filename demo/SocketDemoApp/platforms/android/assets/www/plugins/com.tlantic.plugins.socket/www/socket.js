@@ -43,7 +43,7 @@ Socket.prototype.receive = function (host, port, chunk) {
     evReceive.metadata = {
         host: host,
         port: port,
-        data: typeof chunk == 'object' ? chunk : JSON.parse(chunk)
+        data: chunk
     };
 
     document.dispatchEvent(evReceive);
