@@ -63,18 +63,6 @@ public class SocketPlugin extends CordovaPlugin {
 	private String buildKey(String host, int port) {
 		return (host.toLowerCase() + ":" + port);
 	}
-	
-	/**
-	 * Returns socket connection object
-	 * 
-	 * @param host Target host
-	 * @param port Target port
-	 * @return socket connection object
-	 */
-	private Connection getSocket(String host, int port) {
-		String key = this.buildKey(host, port);
-		return this.pool.get(key);
-	}
 
 	/**
 	 * Opens a socket connection.
@@ -127,22 +115,31 @@ public class SocketPlugin extends CordovaPlugin {
 		Connection socket;
 		
 		// validating parameters
-		if (args.length() < 3) {
+		if (args.length() < 2) {
 			callbackContext.error("Missing arguments when calling 'send' action.");
 		} else {
 			try {
+				// retrieving parameters
+				String key = args.getString(0);
+				String data = args.getString(1);
+				
 				// getting socket
-				socket = this.getSocket(args.getString(0), args.getInt(1));
+				socket = this.pool.get(key);
 				
 				// checking if socket was not found and his connectivity
 				if (socket == null) {
-					callbackContext.error("No connection found with host " + args.getString(0));
+					callbackContext.error("No connection found with host " + key);
+				
 				} else if (!socket.isConnected()) {
-					callbackContext.error("Invalid connection with host " + args.getString(0));
+					callbackContext.error("Invalid connection with host " + key);
+				
+				} else if (data.length() == 0) {
+					callbackContext.error("Cannot send empty data to " + key);
+				
 				} else {
 				
-					// writting on output stream
-					socket.write(args.getString(2));
+					// write on output stream
+					socket.write(data);
 					
 					// ending send process
 					callbackContext.success();	
@@ -162,20 +159,16 @@ public class SocketPlugin extends CordovaPlugin {
 	 */
 	private void disconnect (JSONArray args, CallbackContext callbackContext) {
 		String key;
-		String host;
-		int port;
 		Connection socket;
 
 		// validating parameters
-		if (args.length() < 2) {
+		if (args.length() < 1) {
 			callbackContext.error("Missing arguments when calling 'disconnect' action.");
 		} else {
 
 			try {
 				// preparing parameters
-				host = args.getString(0);
-				port = args.getInt(1);
-				key = this.buildKey(host, port);
+				key = args.getString(0);
 
 				// getting connection from pool
 				socket = pool.get(key);
@@ -237,7 +230,7 @@ public class SocketPlugin extends CordovaPlugin {
 	 * @param chunk
 	 */
 	public synchronized void sendMessage(String host, int port, String chunk) {
-		final String receiveHook = "window.tlantic.plugins.socket.receive('" + host + "'," + port + ",'" + chunk + "');";
+		final String receiveHook = "window.tlantic.plugins.socket.receive('" + host + "'," + port + ",'" + this.buildKey(host, port) + "','" + chunk + "');";
 		
 		cordova.getActivity().runOnUiThread(new Runnable() {
 

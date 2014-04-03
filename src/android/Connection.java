@@ -51,7 +51,13 @@ public class Connection extends Thread {
 	 */
 	public boolean isConnected() {
 
-		boolean result =  (this.callbackSocket == null ? false : this.callbackSocket.isConnected() && this.callbackSocket.isBound() && !this.callbackSocket.isClosed());
+		boolean result =  (
+				this.callbackSocket == null ? false : 
+					this.callbackSocket.isConnected() && 
+					this.callbackSocket.isBound() && 
+					!this.callbackSocket.isClosed() && 
+					!this.callbackSocket.isInputShutdown() && 
+					!this.callbackSocket.isOutputShutdown());
 
 		// if everything apparently is fine, time to test the streams
 		if (result) {
@@ -72,10 +78,10 @@ public class Connection extends Thread {
 	public void close() {
 		// closing connection
 		try {
-			this.writer.close();
-			this.reader.close();
-			//callbackSocket.shutdownInput();
-			//callbackSocket.shutdownOutput();
+			//this.writer.close();
+			//this.reader.close();
+			callbackSocket.shutdownInput();
+			callbackSocket.shutdownOutput();
 			callbackSocket.close();
 			this.mustClose = true;
 		} catch (IOException e) {
