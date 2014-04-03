@@ -83,11 +83,11 @@
 
 
 
--(Boolean) disposeConnection :(NSString *)host :(int)port {
+-(BOOL) disposeConnection :(NSString *)host :(int)port {
     
     NSString *key = nil;
     Connection* socket = nil;
-    Boolean result = false;
+    BOOL result = NO;
     
     
     @try {
@@ -101,7 +101,10 @@
         // closing connection
         if (socket) {
             [pool removeObjectForKey:key];
-            [socket close];
+            
+            if ([socket isConnected]) {
+                [socket close];
+            }
             socket = nil;
             
             NSLog(@"Closed connection with %@", key);
@@ -110,11 +113,11 @@
         }
         
         // setting success
-        result = true;
+        result = YES;
     }
     @catch (NSException *exception) {
         NSLog(@"Exception when closing connection: %@", exception);
-        result = false;
+        result = NO;
     }
     @finally {
         return result;
@@ -152,7 +155,6 @@
                 } else {
                     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unable to close connection!"];
                 }
-                
             }
             @catch (NSException *exception) {
                 NSLog(@"Exception: %@", exception);
@@ -174,7 +176,7 @@
        
         CDVPluginResult* result = nil;
         Connection * socket = nil;
-        Boolean *partial = false;
+        BOOL partial = NO;
         
         @try {
             
@@ -184,7 +186,8 @@
                 
                 // try close it
                 if (![self disposeConnection:socket.host :socket.port]) {
-                    partial = true;
+                    // if no success, need to set as partial disconnection
+                    partial = YES;
                 }
             }
             
@@ -195,6 +198,7 @@
             } else {
                 result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
             }
+            
         }
         @catch (NSException *exception) {
             NSLog(@"Exception: %@", exception);
@@ -239,13 +243,24 @@
                 // getting connection from pool
                 socket = [pool objectForKey:key];
                 
-                // writting on output stream
-                data = [command.arguments objectAtIndex:2];
-                [socket write:data];
+                // checking if socket was not found and his conenctivity
+                if (socket == nil) {
+                    NSLog(@"Connection not found");
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No connection found with host."];
+                    
+                } else if (![socket isConnected]) {
+                    NSLog(@"Socket is not connected.");
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Invalid connection with host."];
+                    
+                } else {
+                    // writting on output stream
+                    data = [command.arguments objectAtIndex:2];
+                    [socket write:data];
                 
-                //formatting success response
-                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
-                NSLog(@"Sending data to %@ - %@", key, data);
+                    //formatting success response
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];
+                    NSLog(@"Sending data to %@ - %@", key, data);
+                }
             }
             @catch (NSException *exception) {
                 NSLog(@"Exception: %@", exception);

@@ -134,7 +134,7 @@ public class SocketPlugin extends CordovaPlugin {
 				// getting socket
 				socket = this.getSocket(args.getString(0), args.getInt(1));
 				
-				// if socket was not found and his connectivity
+				// checking if socket was not found and his connectivity
 				if (socket == null) {
 					callbackContext.error("No connection found with host " + args.getString(0));
 				} else if (!socket.isConnected()) {

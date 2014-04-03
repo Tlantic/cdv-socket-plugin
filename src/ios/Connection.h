@@ -21,6 +21,7 @@
 
 - (id)initWithNetworkAddress :(NSString*)targetHost :(int)targetPort;
 - (void)setDelegate:(id<ConnectionDelegate>)callbackRef;
+- (BOOL)isConnected;
 - (void)open;
 - (void)close;
 - (void)write :(NSString*)data;

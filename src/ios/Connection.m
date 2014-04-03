@@ -17,6 +17,15 @@
     _hook = callbackRef;
 }
 
+- (BOOL)isConnected {
+    NSStreamStatus rStatus = [reader streamStatus];
+    NSStreamStatus wStatus = [writer streamStatus];
+    BOOL result =    (rStatus == NSStreamStatusOpen || rStatus == NSStreamStatusReading || rStatus == NSStreamStatusWriting) &&
+                        (wStatus == NSStreamStatusOpen || wStatus == NSStreamStatusReading || wStatus == NSStreamStatusWriting);
+    
+    return result;
+ }
+
 - (void)open {
     
     // init network communication settings
