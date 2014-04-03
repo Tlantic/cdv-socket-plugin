@@ -2,7 +2,7 @@
 #import "Connection.h"
 #import <cordova/CDV.h>
 
-@implementation CDVSocketPlugin
+@implementation CDVSocketPlugin : CDVPlugin<ConnectionDelegate>
 
 
 - (NSString*)buildKey :(NSString*)host :(int)port {
@@ -83,18 +83,13 @@
 
 
 
--(BOOL) disposeConnection :(NSString *)host :(int)port {
+-(BOOL) disposeConnection :(NSString *)key {
     
-    NSString *key = nil;
     Connection* socket = nil;
     BOOL result = NO;
     
     
     @try {
-        // preparing parameters
-        key = [self buildKey:host :port];
-        
-        
         // getting connection from pool
         socket = [pool objectForKey:key];
         
@@ -129,7 +124,7 @@
 - (void)disconnect:(CDVInvokedUrlCommand*)command
 {
     // validating parameters
-    if ([command.arguments count] < 2) {
+    if ([command.arguments count] < 1) {
         // triggering parameter error
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Missing arguments when calling 'disconnect' action."];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -140,17 +135,14 @@
         [self.commandDelegate runInBackground:^{
             
             CDVPluginResult* result= nil;
-            NSString* host = nil;
-            int port = 0;
+            NSString *key = nil;
             
             @try {
                 // preparing parameters
-                host = [command.arguments objectAtIndex:0];
-                port = [[command.arguments objectAtIndex:1] integerValue];
-
+                key = [command.arguments objectAtIndex:0];
 
                 // closing socket
-                if ([self disposeConnection:host :port]) {
+                if ([self disposeConnection:key]) {
                     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK];
                 } else {
                     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unable to close connection!"];
@@ -217,7 +209,7 @@
 -(void)send: (CDVInvokedUrlCommand *) command {
     
     // validating parameters
-    if ([command.arguments count] < 3) {
+    if ([command.arguments count] < 2) {
         // triggering parameter error
         CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Missing arguments when calling 'send' action."];
         [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
@@ -231,14 +223,10 @@
             Connection* socket = nil;
             NSString* data = nil;
             NSString* key = nil;
-            NSString* host = nil;
-            int port = 0;
             
             @try {
                 // preparing parameters
-                host = [command.arguments objectAtIndex:0];
-                port = [[command.arguments objectAtIndex:1] integerValue];
-                key = [self buildKey:host :port];
+                key = [command.arguments objectAtIndex:0];
                 
                 // getting connection from pool
                 socket = [pool objectForKey:key];
@@ -285,7 +273,7 @@
     [data replaceOccurrencesOfString:@"\n" withString:@"\\n" options:NSCaseInsensitiveSearch range:NSMakeRange(0, [data length])];
     
     // relay to webview
-    NSString *receiveHook= [NSString stringWithFormat:@"window.tlantic.plugins.socket.receive('%@', %d, '%@' );", host, port, [NSString stringWithString:data]];
+    NSString *receiveHook= [NSString stringWithFormat:@"window.tlantic.plugins.socket.receive('%@', %d, '%@', '%@' );", host, port, [self buildKey:host :port], [NSString stringWithString:data]];
     [self writeJavascript:receiveHook];
     
 }

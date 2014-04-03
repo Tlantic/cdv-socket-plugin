@@ -10,6 +10,6 @@
 -(void) disconnectAll: (CDVInvokedUrlCommand *) command;
 -(void) send: (CDVInvokedUrlCommand *) command;
 
--(BOOL) disposeConnection :(NSString *)host :(int)port;
+-(BOOL) disposeConnection :(NSString *)key;
 
 @end
