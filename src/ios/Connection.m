@@ -102,7 +102,7 @@
             break;
             
         case NSStreamEventErrorOccurred:
-            NSLog(@"Can not connect to the host!");
+            NSLog(@"Cannot connect to the host!");
             break;
             
         case NSStreamEventEndEncountered:

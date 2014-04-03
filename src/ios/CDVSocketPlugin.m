@@ -2,7 +2,7 @@
 #import "Connection.h"
 #import <cordova/CDV.h>
 
-@implementation CDVSocketPlugin : CDVPlugin<ConnectionDelegate>
+@implementation CDVSocketPlugin : CDVPlugin
 
 
 - (NSString*)buildKey :(NSString*)host :(int)port {
@@ -177,7 +177,7 @@
                 socket = [pool objectForKey:key];
                 
                 // try close it
-                if (![self disposeConnection:socket.host :socket.port]) {
+                if (![self disposeConnection:key]) {
                     // if no success, need to set as partial disconnection
                     partial = YES;
                 }
@@ -242,7 +242,7 @@
                     
                 } else {
                     // writting on output stream
-                    data = [command.arguments objectAtIndex:2];
+                    data = [command.arguments objectAtIndex:1];
                     [socket write:data];
                 
                     //formatting success response
