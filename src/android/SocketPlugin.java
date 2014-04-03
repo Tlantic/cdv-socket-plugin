@@ -131,13 +131,23 @@ public class SocketPlugin extends CordovaPlugin {
 			callbackContext.error("Missing arguments when calling 'send' action.");
 		} else {
 			try {
-				// getting socket and writting on output stream
+				// getting socket
 				socket = this.getSocket(args.getString(0), args.getInt(1));
-				socket.write(args.getString(2));
 				
-				// ending send process
-				callbackContext.success();
+				// if socket was not found and his connectivity
+				if (socket == null) {
+					callbackContext.error("No connection found with host " + args.getString(0));
+				} else if (!socket.isConnected()) {
+					callbackContext.error("Invalid connection with host " + args.getString(0));
+				} else {
 				
+					// writting on output stream
+					socket.write(args.getString(2));
+					
+					// ending send process
+					callbackContext.success();	
+				}
+								
 			} catch (JSONException e) {
 				callbackContext.error("Unexpected error sending information: " + e.getMessage());
 			}
