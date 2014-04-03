@@ -49,6 +49,10 @@
         <js-module src="src/windows8/SocketProxy.js" name="SocketProxy">
             <merges target="" />
         </js-module>
+        <config-file target="package.appxmanifest" parent="/Package/Capabilities">
+           <Capability Name="privateNetworkClientServer" />
+           <Capability Name="internetClient" />
+        </config-file>
     </platform>    
 
 </plugin>
