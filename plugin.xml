@@ -42,10 +42,7 @@
     </platform>
 
    <!-- windows8 -->
-    <platform name="windows8">
-        <js-module src="src/windows8/Connection.js" name="Connection">
-            <merges target="" />
-        </js-module>           
+    <platform name="windows8">          
         <js-module src="src/windows8/SocketProxy.js" name="SocketProxy">
             <merges target="" />
         </js-module>
