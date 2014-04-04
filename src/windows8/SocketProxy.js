@@ -138,8 +138,47 @@
         }
     };
 
-    exports.send = function (win, fail, data) {
+    exports.send = function (win, fail, args) {
         'use strict';
+
+        var key, data, socket, writer, bufSize;
+
+        // validating parameters
+        if (args.length !== 2) {
+            fail('Missing arguments for "disconnect" action.');
+            return;
+        } else {
+
+            // retrieving existing connection
+            key = args[0];
+            data = args[1];
+
+            socket = exports.pool[key];
+            if (!socket) {
+                fail('Connection ' + key + ' not found!');
+                return;
+            } else {
+
+                // preparing for sending
+                writer = new Windows.Storage.Streams.DataWriter(socket.outputStream);
+                bufSize = writer.measureString(data); // Gets the UTF-8 string length.
+                writer.writeInt32(bufSize);
+                writer.writeString(data);
+
+                console.log('Sending ', data);
+
+                // flushing information
+                writer.storeAsync().done(function () {
+
+                    // detaching outputStream and with success
+                    writer.detachStream();
+                    win();
+
+                }, fail);
+
+            }
+        }
+
     };
 
     exports.sendMessage = function (host, port, connectionId, data) {
