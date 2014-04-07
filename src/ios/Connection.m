@@ -17,6 +17,15 @@
     _hook = callbackRef;
 }
 
+- (BOOL)isConnected {
+    NSStreamStatus rStatus = [reader streamStatus];
+    NSStreamStatus wStatus = [writer streamStatus];
+    BOOL result =    (rStatus == NSStreamStatusOpen || rStatus == NSStreamStatusReading || rStatus == NSStreamStatusWriting) &&
+                        (wStatus == NSStreamStatusOpen || wStatus == NSStreamStatusReading || wStatus == NSStreamStatusWriting);
+    
+    return result;
+ }
+
 - (void)open {
     
     // init network communication settings
@@ -93,7 +102,7 @@
             break;
             
         case NSStreamEventErrorOccurred:
-            NSLog(@"Can not connect to the host!");
+            NSLog(@"Cannot connect to the host!");
             break;
             
         case NSStreamEventEndEncountered:

@@ -16,9 +16,9 @@ Socket.prototype.connect = function (successCallback, errorCallback, host, port)
 };
 
 //
-Socket.prototype.disconnect = function (successCallback, errorCallback, host, port) {
+Socket.prototype.disconnect = function (successCallback, errorCallback, connectionId) {
     'use strict';
-    exec(successCallback, errorCallback, this.pluginRef, 'disconnect', [host, port]);
+    exec(successCallback, errorCallback, this.pluginRef, 'disconnect', [connectionId]);
 };
 
 //
@@ -28,21 +28,24 @@ Socket.prototype.disconnectAll = function (successCallback, errorCallback) {
 };
 
 //
-Socket.prototype.send = function (successCallback, errorCallback, host, port, data) {
+Socket.prototype.send = function (successCallback, errorCallback, connectionId, data) {
     'use strict';
-    exec(successCallback, errorCallback, this.pluginRef, 'send', [host, port, typeof data == 'string' ? data : JSON.stringify(data)]);
+    exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data)]);
 };
 
 //
-Socket.prototype.receive = function (host, port, chunk) {
+Socket.prototype.receive = function (host, port, connectionId, chunk) {
     'use strict';
 
     var evReceive = document.createEvent('Events');
     
-    evReceive.initEvent(this.receiveHookName);
+    evReceive.initEvent(this.receiveHookName, true, true);
     evReceive.metadata = {
-        host: host,
-        port: port,
+        connection: {
+            id: connectionId,
+            host: host,
+            port: port,
+        },
         data: chunk
     };
 

@@ -50,7 +50,26 @@ public class Connection extends Thread {
 	 * @return true if socket connection is established or false case else.
 	 */
 	public boolean isConnected() {
-		return this.callbackSocket.isConnected();
+
+		boolean result =  (
+				this.callbackSocket == null ? false : 
+					this.callbackSocket.isConnected() && 
+					this.callbackSocket.isBound() && 
+					!this.callbackSocket.isClosed() && 
+					!this.callbackSocket.isInputShutdown() && 
+					!this.callbackSocket.isOutputShutdown());
+
+		// if everything apparently is fine, time to test the streams
+		if (result) {
+			try {
+				this.callbackSocket.getInputStream().available();
+			} catch (IOException e) {
+				// connection lost
+				result = false;
+			}
+		}
+
+		return result;
 	}
 
 	/**
@@ -59,10 +78,12 @@ public class Connection extends Thread {
 	public void close() {
 		// closing connection
 		try {
-			this.mustClose = true;
-			this.writer.close();
-			this.reader.close();
+			//this.writer.close();
+			//this.reader.close();
+			callbackSocket.shutdownInput();
+			callbackSocket.shutdownOutput();
 			callbackSocket.close();
+			this.mustClose = true;
 		} catch (IOException e) {
 			e.printStackTrace();
 		}		
@@ -91,15 +112,22 @@ public class Connection extends Thread {
 			this.callbackSocket = new Socket(this.host, this.port);
 			this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
 			this.reader = new BufferedReader(new InputStreamReader(callbackSocket.getInputStream()));
-			
+
 			// receiving data chunk
 			while(!this.mustClose){
 
 				try {
-					chunk = reader.readLine().replaceAll("\"\"", "null");
-					System.out.print("## RECEIVED DATA: " + chunk);
-					hook.sendMessage(this.host, this.port, chunk);
-				} catch (IOException e) {
+
+					if (this.isConnected()) {
+						chunk = reader.readLine();
+
+						if (chunk != null) {
+							chunk = chunk.replaceAll("\"\"", "null");
+							System.out.print("## RECEIVED DATA: " + chunk);
+							hook.sendMessage(this.host, this.port, chunk);
+						}
+					}
+				} catch (Exception e) {
 					e.printStackTrace();
 				}
 			}
