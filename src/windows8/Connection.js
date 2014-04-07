@@ -1,7 +1,7 @@
 /* global module, Windows, console, require */
 'use strict';
 
-    // Connection Class Definition
+     // Connection Class Definition
     module.exports = function Connection(host, port) {
         var self = this,
         mustClose = false,
@@ -54,6 +54,7 @@
 
         // Socket write
         self.write = function Write(data, cbSuccess, cbFailure) {
+
             // preparing for sending
             var writer = new Windows.Storage.Streams.DataWriter(rawSocket.outputStream),
                 bufSize = writer.measureString(data); // Gets the UTF-8 string length.
@@ -115,5 +116,4 @@
     };
 
     // exporting module
-    require('cordova/windows8/commandProxy').add('Socket', module.exports);
-
+    require('cordova/windows8/commandProxy').add('Connection', module);

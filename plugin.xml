@@ -50,8 +50,9 @@
             <merges target="" />
         </js-module>
         <config-file target="package.appxmanifest" parent="/Package/Capabilities">
-           <Capability Name="privateNetworkClientServer" />
-           <Capability Name="internetClient" />
+            <Capability Name="internetClientServer" />
+            <Capability Name="privateNetworkClientServer" />
+            <Capability Name="internetClient" />
         </config-file>
     </platform>    
 
