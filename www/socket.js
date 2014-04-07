@@ -39,7 +39,7 @@ Socket.prototype.receive = function (host, port, connectionId, chunk) {
 
     var evReceive = document.createEvent('Events');
     
-    evReceive.initEvent(this.receiveHookName);
+    evReceive.initEvent(this.receiveHookName, true, true);
     evReceive.metadata = {
         connection: {
             id: connectionId,

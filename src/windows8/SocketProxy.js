@@ -1,191 +1,117 @@
-    /* global exports, console, Windows, require */
+    /* global module, console, Windows, require */
+    'use strict';
 
-    
+   // Connection Class Definition
+   module.exports = function Connection(host, port) {
+    var self = this,
+    mustClose = false,
+    rawSocket,
+    hostname,
+    service,
+    reader;
 
+        // init - constructor
+        self.init = function Initialize(host, port) {
 
-    //
-    exports.pool = [];
+            // setting instance properties
+            self.host = host;
+            self.port = port;
 
-    //
-    exports.buildKey = function (host, port) {
-        'use strict';
-        return host.toLowerCase() + ':' + port;
-    };
+            // creating network objects
+            hostname = new Windows.Networking.HostName(host);
+            service = port.toString();
+            rawSocket = new Windows.Networking.Sockets.StreamSocket();
+        };
 
-    //
-    exports.connect = function (win, fail, args) {
-        'use strict';
-        var host, port, key, socket, hostname, service;
+        // Socket connect
+        self.connect = function Connect(cbSuccess, cbFailure) {
+            rawSocket.connectAsync(hostname, service).done(function onConnect() {
 
-        // validating parameters
-        if (args.length !== 2) {
-            fail('Missing arguments for "connect" action.');
-            return;
+                try {
+                    // opening inputStream for reading
+                    reader = new Windows.Storage.Streams.DataReader(rawSocket.inputStream);
+                    reader.inputStreamOptions = Windows.Storage.Streams.InputStreamOptions.partial;
 
-        } else {
+                    // start reading
+                    self.startReader();
 
-            // building connection key
-            host = args[0];
-            port = args[1];
-            key = exports.buildKey(host, port);
-
-            // trying to recover an existing connection
-            if (exports.pool[key]) {
-                console.log('Recovered connection with ', key);
-                win(key);
-                return;
-
-            } else {
-
-                // creating new connection;
-                hostname = new Windows.Networking.HostName(host);
-                service = port.toString();
-                socket = new Windows.Networking.Sockets.StreamSocket();
-
-                // opening stream
-                socket.connectAsync(hostname, service).done(function () {
-
-                    // adding to pool
-                    console.log('Connection with ', key, ' opened successfully!');
-                    exports.pool[key] = socket;
-
-                    // returning key as success sign
-                    win(key);
-                }, fail);
-            }
-        }
-
-    };
-
-    exports.disposeConnection = function (socket) {
-        'use strict';
-
-        var result = false;
-
-        try {
-            socket.close();
-            result = true;
-
-        } catch (e) {
-            console.log('Unable to close connection!');
-            result = false;
-
-        } finally {
-            return result;
-        }
-    };
-
-    exports.disconnect = function (win, fail, args) {
-        'use strict';
-
-        var key, socket;
-
-        // validating parameters
-        if (args.length !== 1) {
-            fail('Missing arguments for "disconnect" action.');
-            return;
-        } else {
-
-            // retrieving existing connection
-            key = args[0];
-            socket = exports.pool[key];
-            if (!socket) {
-                fail('Connection ' + key + ' not found!');
-                return;
-            } else {
-
-                // removing from pool and closing socket
-                exports.pool[key] = undefined;
-
-                if (exports.disposeConnection(socket)) {
-                    win();
-                } else {
-                    fail('Unable to close connection with ' + key);
+                    // returning success
+                    cbSuccess();
+                } catch (e) {
+                    console.log('Unable to establish connection: ', e);
+                    cbFailure(e);
+                    self.close();
                 }
 
-                return;
-            }
-        }
+            }, cbFailure);
+        };
 
-    };
+        // Socket closure
+        self.close = function Close() {
+            mustClose = true;
+            rawSocket.close();
+        };
 
-    exports.disconnectAll = function (win, fail) {
-        'use strict';
-        var socket, partial = false;
-
-        console.log('Preparing to disconnect all connections:');
-
-        // checking all connections from pool
-        for (var key in exports.pool) {
-
-            // retrieving existing socket
-            console.log('- Closing ', key, ' ...');
-            socket = exports.pool[key];
-
-            // disposing socket
-            if (!exports.disposeConnection(socket)) {
-                partial = true;
-                console.log('- Unable to close ', key);
-            }
-
-            // removing from pool
-            exports.pool[key] = undefined;
-        }
-
-
-        // returning based on all results
-        if (partial) {
-            fail('Some connections could not be closed!');
-        } else {
-            win();
-        }
-    };
-
-    exports.send = function (win, fail, args) {
-        'use strict';
-
-        var key, data, socket, writer, bufSize;
-
-        // validating parameters
-        if (args.length !== 2) {
-            fail('Missing arguments for "disconnect" action.');
-            return;
-        } else {
-
-            // retrieving existing connection
-            key = args[0];
-            data = args[1];
-
-            socket = exports.pool[key];
-            if (!socket) {
-                fail('Connection ' + key + ' not found!');
-                return;
-            } else {
-
-                // preparing for sending
-                writer = new Windows.Storage.Streams.DataWriter(socket.outputStream);
+        // Socket write
+        self.write = function Write(data, cbSuccess, cbFailure) {
+            // preparing for sending
+            var writer = new Windows.Storage.Streams.DataWriter(rawSocket.outputStream),
                 bufSize = writer.measureString(data); // Gets the UTF-8 string length.
+
                 writer.writeInt32(bufSize);
                 writer.writeString(data);
 
                 console.log('Sending ', data);
 
-                // flushing information
-                writer.storeAsync().done(function () {
+            // flushing information
+            writer.storeAsync().done(function () {
 
-                    // detaching outputStream and with success
-                    writer.detachStream();
-                    win();
+                // detaching outputStream and with success
+                writer.detachStream();
+                cbSuccess();
 
-                }, fail);
+            }, cbFailure);
 
-            }
-        }
+        };
 
+        // Socket start receiving data
+        self.startReader = function startReader() {
+
+            // starting to read Async
+            return reader.loadAsync(99999999).then(function (bytesRead) {
+
+                // reading buffer
+                var chunk;
+
+                try {
+                    chunk = reader.readString(reader.unconsumedBufferLength);
+
+                    // handling data receiving
+                    if (bytesRead !== 0 && !mustClose) {
+                        self.onReceive(self.host, self.port, chunk);
+                    }
+
+                    // checking reading ending
+                    if (mustClose) {
+                        return;
+                    } else {
+                        return startReader();
+                    }
+                } catch (e) {
+                    console.log('Unexpected connection closure with ', self.host, ' on port ', self.port, ': ', e);
+                    mustClose = true;
+                    return;
+                }
+            });
+        };
+
+        // Socket data receiving
+        self.onReceive = function onReceive() {
+            console.log('no callback defined for Socket.OnReceive!');
+        };
+
+        // initializing object instance
+        self.init(host, port);
     };
-
-    exports.sendMessage = function (host, port, connectionId, data) {
-        'use strict';
-    };
-
-    require('cordova/windows8/commandProxy').add('Socket', exports);
+    
+    require('cordova/windows8/commandProxy').add('Socket', module.exports);
