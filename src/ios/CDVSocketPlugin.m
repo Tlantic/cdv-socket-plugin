@@ -11,7 +11,7 @@
     return  [[tempHost stringByAppendingString : @":"] stringByAppendingString:tempPort];
 }
 
-- (void)connect : (CDVInvokedUrlCommand*) command {
+- (void) connect : (CDVInvokedUrlCommand*) command {
     // Validating parameters
     if ([command.arguments count] < 2) {
         
