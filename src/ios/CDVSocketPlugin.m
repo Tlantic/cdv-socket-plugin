@@ -83,6 +83,57 @@
 
 
 
+- (void) isConnected:(CDVInvokedUrlCommand *)command
+{
+    // validating parameters
+    if ([command.arguments count] < 1) {
+        
+        // triggering parameter error
+        CDVPluginResult* result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Missing arguments when calling 'isConnected' action."];
+        [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        
+    } else {
+        
+        // running in background to avoid thread locks
+        [self.commandDelegate runInBackground:^{
+            
+            CDVPluginResult* result= nil;
+            Connection* socket = nil;
+            NSString* key = nil;
+            
+            @try {
+                // preparing parameters
+                key = [command.arguments objectAtIndex:0];
+                
+                // getting connection from pool
+                socket = [pool objectForKey:key];
+                
+                // checking if socket was not found and his conenctivity
+                if (socket == nil) {
+                    NSLog(@"Connection not found");
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"No connection found with host."];
+                } else {
+                    // writting on output stream
+                    
+                    //formatting success response
+                    result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsBool:[socket isConnected]];
+                    NSLog(@"Checking data connection...");
+                }
+            }
+            @catch (NSException *exception) {
+                NSLog(@"Exception: %@", exception);
+                result = [CDVPluginResult resultWithStatus:CDVCommandStatus_ERROR messageAsString:@"Unexpected exception when executon 'isConnected' action."];
+            }
+            
+            //returning callback resolution
+            [self.commandDelegate sendPluginResult:result callbackId:command.callbackId];
+        }];
+    }
+    
+}
+
+
+
 -(BOOL) disposeConnection :(NSString *)key {
     
     Connection* socket = nil;

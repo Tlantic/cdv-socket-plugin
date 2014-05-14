@@ -26,6 +26,12 @@ Socket.prototype.disconnectAll = function (successCallback, errorCallback) {
     'use strict';
     exec(successCallback, errorCallback, this.pluginRef, 'disconnectAll', []);
 };
+               
+//
+Socket.prototype.isConnected = function (connectionId, successCallback, errorCallback) {
+    'use strict';
+    exec(successCallback, errorCallback, this.pluginRef, 'isConnected', [connectionId]);
+}
 
 //
 Socket.prototype.send = function (successCallback, errorCallback, connectionId, data) {
@@ -51,5 +57,4 @@ Socket.prototype.receive = function (host, port, connectionId, chunk) {
 
     document.dispatchEvent(evReceive);
 };
-
 module.exports = new Socket();
