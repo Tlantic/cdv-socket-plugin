@@ -1,100 +1,90 @@
 #import "Connection.h"
 
-
 @implementation Connection: NSObject
 
-- (id)initWithNetworkAddress:(NSString *)targetHost :(int)targetPort {
+- (id) initWithNetworkAddress : (NSString *) targetHost : (int) targetPort {
     self = [super init];
-    if (self)
-    {
+    if (self) {
         _host = targetHost;
         _port = targetPort;
+        connected = NO;
     }
     return self;
 }
 
-- (void)setDelegate:(id<ConnectionDelegate>)callbackRef {
+- (void) setDelegate : (id<ConnectionDelegate>) callbackRef {
     _hook = callbackRef;
 }
 
-- (BOOL)isConnected {
-    NSStreamStatus rStatus = [reader streamStatus];
-    NSStreamStatus wStatus = [writer streamStatus];
-    BOOL result =    (rStatus == NSStreamStatusOpen || rStatus == NSStreamStatusReading || rStatus == NSStreamStatusWriting) &&
-                        (wStatus == NSStreamStatusOpen || wStatus == NSStreamStatusReading || wStatus == NSStreamStatusWriting);
-    
-    return result;
+- (BOOL) isConnected {
+    return connected;
  }
 
-- (void)open {
-    
-    // init network communication settings
+- (void) open {
+    // Init network communication settings
     CFReadStreamRef readStream;
     CFWriteStreamRef writeStream;
     
-    // opening connection
+    // Opening connection
     CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)_host, _port, &readStream, &writeStream);
     
-    // configuring input stream
+    // Configuring input stream
     reader = objc_retainedObject(readStream);
     [reader setDelegate:self];
     [reader scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     [reader open];
     
-    // configuring output stream
+    // Configuring output stream
     writer = objc_retainedObject(writeStream);
     [writer setDelegate:self];
     [writer scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [writer open];
 }
 
-- (void)close {
-    
-    // closing output stream
+- (void) close {
+    // Closing output stream
     [writer close];
     [writer removeFromRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [writer setDelegate:nil];
     writer = nil;
     
-    // closing input stream
+    // Closing input stream
     [reader close];
     [reader removeFromRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     [reader setDelegate:nil];
     reader = nil;
 }
 
-
-- (void)write :(NSString *)data {
-    NSData *chunk = [[NSData alloc] initWithData:[data dataUsingEncoding:NSASCIIStringEncoding]];
-    [writer write:[chunk bytes] maxLength:[chunk length]];
+- (void) write : (NSString *) data {
+    NSData *chunk = [[NSData alloc] initWithData : [data dataUsingEncoding : NSASCIIStringEncoding]];
+    [writer write : [chunk bytes] maxLength : [chunk length]];
 }
 
-
-- (void)stream:(NSStream *)theStream handleEvent:(NSStreamEvent)streamEvent {
+- (void) stream : (NSStream *) theStream handleEvent : (NSStreamEvent) streamEvent {
 	switch (streamEvent) {
-            
 		case NSStreamEventOpenCompleted:
 			NSLog(@"Stream opened!");
+            connected = YES;
 			break;
             
-            // DATA RECEIVING
+        // Data receiving
 		case NSStreamEventHasBytesAvailable:
-            
             if (theStream == reader) {
-                
-                uint8_t buffer[1024];
-                int len;
+                uint8_t buffer[10240];
+                NSInteger len;
                 
                 while ([reader hasBytesAvailable]) {
-                    len = [reader read:buffer maxLength:sizeof(buffer)];
+                    len = [reader read : buffer maxLength : sizeof(buffer)];
                     
                     if (len > 0) {
                         
-                        NSString *chunk = [[NSString alloc] initWithBytes:buffer length:len encoding:NSASCIIStringEncoding];
+                        NSString *chunk = [[NSString alloc] initWithBytes : buffer
+                                                                   length : len
+                                                                 encoding : NSASCIIStringEncoding];
                         
                         if (nil != chunk) {
                             NSLog(@"Received data: %@", chunk);
-                            [_hook sendMessage:_host :_port :chunk];
+                            [_hook sendMessage : _host : _port : chunk];
                         }
                     }
                 }
@@ -103,10 +93,12 @@
             
         case NSStreamEventErrorOccurred:
             NSLog(@"Cannot connect to the host!");
+            connected = NO;
             break;
             
         case NSStreamEventEndEncountered:
             NSLog(@"Stream closed!");
+            connected = NO;
             break;
             
         default:
