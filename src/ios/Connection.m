@@ -71,11 +71,13 @@
 		case NSStreamEventHasBytesAvailable:
             
             if (theStream == reader) {
+                
                 uint8_t buffer[1024];
                 unsigned int len = 0;
                 NSString* chunk = @"";
                 NSString* temp = nil;
-                
+ 
+                //
                 while ([reader hasBytesAvailable]) {
                     len = [reader read:buffer   maxLength:sizeof(buffer)];
                     
@@ -92,14 +94,17 @@
                     }
                 }
                 
-                // returning data
-                NSLog(@"\n\nReceived data: %@", chunk);
-                [_hook sendMessage : _host : _port : chunk];
+                //
+                if ([temp characterAtIndex:[temp length]-1] == '\n') {
+                    NSLog(@"\n\nReceived data: %@", chunk);
+                    [_hook sendMessage : _host : _port : chunk];
+                }
+                
             }
             break;
             
         case NSStreamEventErrorOccurred:
-            NSLog(@"Cannot connect to the host!");
+            NSLog(@"Connection has been interrupted!");
             connected = NO;
             break;
             
