@@ -69,25 +69,32 @@
             
         // Data receiving
 		case NSStreamEventHasBytesAvailable:
+            
             if (theStream == reader) {
-                uint8_t buffer[10240];
-                NSInteger len;
+                uint8_t buffer[1024];
+                unsigned int len = 0;
+                NSString* chunk = @"";
+                NSString* temp = nil;
                 
                 while ([reader hasBytesAvailable]) {
-                    len = [reader read : buffer maxLength : sizeof(buffer)];
+                    len = [reader read:buffer   maxLength:sizeof(buffer)];
                     
+                    // validating data read
                     if (len > 0) {
                         
-                        NSString *chunk = [[NSString alloc] initWithBytes : buffer
-                                                                   length : len
-                                                                 encoding : NSASCIIStringEncoding];
+                        temp = [[NSString alloc] initWithBytes:buffer   length:len  encoding:NSASCIIStringEncoding];
                         
-                        if (nil != chunk) {
-                            NSLog(@"Received data: %@", chunk);
-                            [_hook sendMessage : _host : _port : chunk];
+                        // checking piece of data
+                        if (nil != temp) {
+                            NSLog(@"\n\nReading buffer: %@", temp);
+                            chunk = [chunk stringByAppendingString:temp];
                         }
                     }
                 }
+                
+                // returning data
+                NSLog(@"\n\nReceived data: %@", chunk);
+                [_hook sendMessage : _host : _port : chunk];
             }
             break;
             
