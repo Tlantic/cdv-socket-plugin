@@ -35,6 +35,10 @@ public class SocketPlugin extends CordovaPlugin {
 			this.connect(args, callbackContext);
 			return true;
 
+		}else if(action.equals("isConnected")) {
+			this.isConnected(args, callbackContext);
+			return true;
+			
 		}else if(action.equals("send")) {
 			this.send(args, callbackContext);
 			return true;
@@ -104,6 +108,43 @@ public class SocketPlugin extends CordovaPlugin {
 			}
 		}
 	}
+	
+	/**
+	 * Returns connection information
+	 * 
+	 * @param args
+	 * @param callbackContext
+	 */
+	private void isConnected(JSONArray args, CallbackContext callbackContext) {
+		Connection socket;
+		
+		// validating parameters
+		if (args.length() < 1) {
+			callbackContext.error("Missing arguments when calling 'isConnected' action.");
+		} else {
+			try {
+				// retrieving parameters
+				String key = args.getString(0);
+				
+				// getting socket
+				socket = this.pool.get(key);
+				
+				// checking if socket was not found and his connectivity
+				if (socket == null) {
+					callbackContext.error("No connection found with host " + key);
+				
+				} else {
+					
+					// ending send process
+					callbackContext.success( (socket.isConnected() ? 1 : 0) );	
+				}
+								
+			} catch (JSONException e) {
+				callbackContext.error("Unexpected error sending information: " + e.getMessage());
+			}
+		}
+	}
+	
 
 	/**
 	 * Send information to target host
@@ -230,7 +271,7 @@ public class SocketPlugin extends CordovaPlugin {
 	 * @param chunk
 	 */
 	public synchronized void sendMessage(String host, int port, String chunk) {
-		final String receiveHook = "window.tlantic.plugins.socket.receive('" + host + "'," + port + ",'" + this.buildKey(host, port) + "','" + chunk + "');";
+		final String receiveHook = "window.tlantic.plugins.socket.receive(\"" + host + "\"," + port + ",\"" + this.buildKey(host, port) + "\",\"" + chunk.replace("\"", "\\\"") + "\");";
 		
 		cordova.getActivity().runOnUiThread(new Runnable() {
 
