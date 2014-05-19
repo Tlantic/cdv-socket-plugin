@@ -69,42 +69,30 @@
             
         // Data receiving
 		case NSStreamEventHasBytesAvailable:
-            
             if (theStream == reader) {
+                uint8_t buffer[10240];
+                NSInteger len;
                 
-                uint8_t buffer[1024];
-                unsigned int len = 0;
-                NSString* chunk = @"";
-                NSString* temp = nil;
- 
-                //
                 while ([reader hasBytesAvailable]) {
-                    len = [reader read:buffer   maxLength:sizeof(buffer)];
+                    len = [reader read : buffer maxLength : sizeof(buffer)];
                     
-                    // validating data read
                     if (len > 0) {
                         
-                        temp = [[NSString alloc] initWithBytes:buffer   length:len  encoding:NSASCIIStringEncoding];
+                        NSString *chunk = [[NSString alloc] initWithBytes : buffer
+                                                                   length : len
+                                                                 encoding : NSASCIIStringEncoding];
                         
-                        // checking piece of data
-                        if (nil != temp) {
-                            NSLog(@"\n\nReading buffer: %@", temp);
-                            chunk = [chunk stringByAppendingString:temp];
+                        if (nil != chunk) {
+                            NSLog(@"Received data: %@", chunk);
+                            [_hook sendMessage : _host : _port : chunk];
                         }
                     }
                 }
-                
-                //
-                if ([temp characterAtIndex:[temp length]-1] == '\n') {
-                    NSLog(@"\n\nReceived data: %@", chunk);
-                    [_hook sendMessage : _host : _port : chunk];
-                }
-                
             }
             break;
             
         case NSStreamEventErrorOccurred:
-            NSLog(@"Connection has been interrupted!");
+            NSLog(@"Cannot connect to the host!");
             connected = NO;
             break;
             
