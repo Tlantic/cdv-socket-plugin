@@ -65,8 +65,8 @@
 
 
 - (void)write :(NSString *)data {
-    NSData *chunk = [[NSData alloc] initWithData:[data dataUsingEncoding:NSASCIIStringEncoding]];
-    [writer write:[chunk bytes] maxLength:[chunk length]];
+    NSData *sendBuffer = [[NSData alloc] initWithData:[data dataUsingEncoding:NSASCIIStringEncoding]];
+    [writer write:[sendBuffer bytes] maxLength:[sendBuffer length]];
 }
 
 
