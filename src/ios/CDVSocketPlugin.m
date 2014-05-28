@@ -148,7 +148,8 @@
     Connection* socket = nil;
     BOOL result = NO;
     
-    @try {
+    @try {  
+        
         // Getting connection from pool
         socket = [pool objectForKey : key];
         
@@ -227,9 +228,14 @@
         BOOL partial = NO;
         
         @try {
+        
+            // Creating a Mutable Dictionary to avoid the Exception:
+            // -- "Collection was mutated while being enumerated"
+            NSMutableDictionary* toDelete = [NSMutableDictionary dictionary];
+            [toDelete addEntriesFromDictionary:(NSDictionary *)pool];      
             
-            // Iterating connection pool
-            for (id key in pool) {
+            // Iterating toDelete object that is the connection pool
+            for (id key in toDelete) {
                 socket = [pool objectForKey : key];
                 
                 // Try to close it
