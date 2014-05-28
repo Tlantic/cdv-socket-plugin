@@ -244,8 +244,6 @@
                     partial = YES;
                 }
             }
-            // Returning the modified Collection to the Pool
-            [pool addEntriesFromDictionary:(NSDictionary *)toDelete];
             
             // Formatting result
             if (partial)
