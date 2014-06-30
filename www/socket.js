@@ -39,6 +39,12 @@ Socket.prototype.send = function (successCallback, errorCallback, connectionId, 
     exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data)]);
 };
 
+///
+Socket.prototype.sendBinary = function (successCallback, errorCallback, connectionId, data) {
+    'use strict';
+    exec(successCallback, errorCallback, this.pluginRef, 'sendBinary', [connectionId, data]);
+};
+
 //
 Socket.prototype.receive = function (host, port, connectionId, chunk) {
     'use strict';
