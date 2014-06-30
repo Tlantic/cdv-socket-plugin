@@ -3,6 +3,7 @@ package com.tlantic.plugins.socket;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStream;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
@@ -19,6 +20,7 @@ public class Connection extends Thread {
 
 	private Socket callbackSocket;
 	private PrintWriter writer;
+	private OutputStream outputStream;
 	private BufferedReader reader;
 
 	private Boolean mustClose;
@@ -101,6 +103,17 @@ public class Connection extends Thread {
 
 
 
+	/**
+	 * Outputs to socket output stream to send binary data to target host.
+	 * 
+	 * @param data information to be sent
+	 */
+	public void writeBinary(byte[] data) throws IOException {
+		this.outputStream.write(data);
+	}
+
+
+
 	/* (non-Javadoc)
 	 * @see java.lang.Thread#run()
 	 */
@@ -111,6 +124,7 @@ public class Connection extends Thread {
 		try {
 			this.callbackSocket = new Socket(this.host, this.port);
 			this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
+			this.outputStream = this.callbackSocket.getOutputStream();
 			this.reader = new BufferedReader(new InputStreamReader(callbackSocket.getInputStream()));
 
 			// receiving data chunk

@@ -25,7 +25,8 @@ The plugin creates a "Socket" object exposed on window.tlantic.plugins.socket. T
 * connect: opens a socket connection;
 * disconnect: closes a socket connection;
 * disconnectAll: closes ALL opened connections;
-* send: send data using a given connection;
+* send: send text data using a given connection;
+* sendBinary: send binary data using a given connection;
 * isConnected: returns a boolean falg representing socket connectivity status;
 * receive: callback used by plugin's native code. Can be override by a custom implementation.
 
@@ -90,7 +91,7 @@ window.tlantic.plugins.socket.connect(
 
 ### send (successCallback, errorCallback, connectionId, data)
 
-Sends information and calls success callback if information was send and does not wait for any response. To check how to receive data, please see the item below.
+Sends text information and calls success callback if information was sent and does not wait for any response. To check how to receive data, please see the item below.
 
 Example:
 
@@ -108,7 +109,29 @@ window.tlantic.plugins.socket.send(
 );
 ```
 
-### isConnected (connectionId, successCallback, errorCallback)
+### sendBinary (successCallback, errorCallback, connectionId, data)
+
+Sends binary data and calls success callback if information was sent and does not wait for any response. To check how to receive data, please see the item below.
+
+Binary data to be sent is passed in `data` which is a JSONArray, one integer element per byte.
+
+Example:
+
+```
+window.tlantic.plugins.socket.sendBinary(
+  function () {
+    console.log('worked!');  
+  },
+  
+  function () {
+    console.log('failed!');
+  },
+  '192.168.2.5:18002',
+  [ 0x00, 0x01, 0x00, 0xFD ]
+);
+```
+
+#### isConnected (connectionId, successCallback, errorCallback)
 
 Returns a boolean value representing the connection status. True, if socket streams are opened and false case else.
 Both values are supposed to be returned through successCallback. The error callback is called only when facing errors due the check process.

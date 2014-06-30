@@ -2,6 +2,8 @@ package com.tlantic.plugins.socket;
 
 import android.annotation.SuppressLint;
 
+import java.io.IOException;
+
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
@@ -41,6 +43,10 @@ public class SocketPlugin extends CordovaPlugin {
 			
 		}else if(action.equals("send")) {
 			this.send(args, callbackContext);
+			return true;
+
+		}else if(action.equals("sendBinary")) {
+			this.sendBinary(args, callbackContext);
 			return true;
 
 		} else if (action.equals("disconnect")) {
@@ -184,6 +190,61 @@ public class SocketPlugin extends CordovaPlugin {
 					
 					// ending send process
 					callbackContext.success();	
+				}
+								
+			} catch (JSONException e) {
+				callbackContext.error("Unexpected error sending information: " + e.getMessage());
+			}
+		}
+	}
+
+
+	/**
+	 * Send binary information to target host
+	 * 
+	 * @param args
+	 * @param callbackContext
+	 */
+	private void sendBinary(JSONArray args, CallbackContext callbackContext) {
+		Connection socket;
+		
+		// validating parameters
+		if (args.length() < 2) {
+			callbackContext.error("Missing arguments when calling 'sendBinary' action.");
+		} else {
+			try {
+				// retrieving parameters
+				String key = args.getString(0);
+				JSONArray jsData = args.getJSONArray(1);
+				byte[] data = new byte[jsData.length()];
+				for (int i=0; i<jsData.length(); i++)
+					data[i]=(byte)jsData.getInt(i);
+				
+				// getting socket
+				socket = this.pool.get(key);
+				
+				// checking if socket was not found and his connectivity
+				if (socket == null) {
+					callbackContext.error("No connection found with host " + key);
+				
+				} else if (!socket.isConnected()) {
+					callbackContext.error("Invalid connection with host " + key);
+				
+				} else if (data.length == 0) {
+					callbackContext.error("Cannot send empty data to " + key);
+				
+				} else {
+				
+					try {
+						// write on output stream
+						socket.writeBinary(data);
+					
+						// ending send process
+						callbackContext.success();	
+
+					} catch (IOException e) {
+						callbackContext.error("I/O error sending to " + key);
+					}
 				}
 								
 			} catch (JSONException e) {
