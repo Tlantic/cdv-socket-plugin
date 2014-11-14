@@ -344,8 +344,8 @@
     // Relay to webview
     NSString *receiveHook = [NSString stringWithFormat : @"window.tlantic.plugins.socket.receive('%@', %d, '%@', '%@' );",
                                 host, port, [self buildKey : host : port], [NSString stringWithString : data]];
-    
-    [self writeJavascript:receiveHook];
+
+    [self.commandDelegate evalJs:receiveHook];
 }
 
 @end
