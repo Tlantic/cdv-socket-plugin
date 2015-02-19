@@ -2,6 +2,7 @@
     'use strict';
 
     var Connection = require('com.tlantic.plugins.socket.Connection');
+    var Socket = require('com.tlantic.plugins.socket.Socket');
 
     // connection pool
     exports.pool = [];
@@ -174,7 +175,7 @@
 
         var key = exports.buildKey(host, port);
     
-        window.tlantic.plugins.socket.receive(host, port, key, data);
+        Socket.receive(host, port, key, data);
     };
 
     require('cordova/windows8/commandProxy').add('Socket', exports);
