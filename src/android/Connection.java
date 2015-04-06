@@ -1,11 +1,18 @@
 package com.tlantic.plugins.socket;
 
+import android.util.Log;
+
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
 import java.io.PrintWriter;
+import java.lang.Exception;
+import java.lang.String;
+import java.net.ConnectException;
+import java.net.InetSocketAddress;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import org.apache.cordova.CallbackContext;
 
 
 /**
@@ -24,7 +31,24 @@ public class Connection extends Thread {
 	private Boolean mustClose;
 	private String host;
 	private int port;
+    private CallbackContext callbackContext;
+    private String buildKey;
 
+    public String getBuildKey() {
+        return buildKey;
+    }
+
+    public void setBuildKey(String buildKey) {
+        this.buildKey = buildKey;
+    }
+
+    public CallbackContext getCallbackContext() {
+        return callbackContext;
+    }
+
+    public void setCallbackContext(CallbackContext callbackContext) {
+        this.callbackContext = callbackContext;
+    }
 
 	/**
 	 * Creates a TCP socket connection object.
@@ -42,6 +66,20 @@ public class Connection extends Thread {
 		this.port = port;
 		this.hook = pool;
 	}
+
+    /**
+     * Creates a TCP socket connection object.
+     *
+     * @param pool Object containing "sendMessage" method to be called as a callback for data receive.
+     * @param host Target host for socket connection.
+     * @param port Target port for socket connection
+     * @param callbackContext for sending callbacks
+     */
+    public Connection(SocketPlugin pool, String host, int port, CallbackContext callbackContext, String buildKey) {
+        this(pool, host, port);
+        this.callbackContext = callbackContext;
+        this.buildKey = buildKey;
+    }
 
 
 	/**
@@ -109,8 +147,10 @@ public class Connection extends Thread {
 
 		// creating connection
 		try {
-			this.callbackSocket = new Socket(this.host, this.port);
-			this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
+			this.callbackSocket = new Socket();
+            this.callbackSocket.connect(new InetSocketAddress(this.host, this.port), 20000);
+            this.callbackContext.success(this.buildKey);
+            this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
 			this.reader = new BufferedReader(new InputStreamReader(callbackSocket.getInputStream()));
 
 			// receiving data chunk
@@ -126,7 +166,9 @@ public class Connection extends Thread {
 							System.out.print("## RECEIVED DATA: " + chunk);
 							hook.sendMessage(this.host, this.port, chunk);
 						}
-					}
+					} else {
+						
+                    			}
 				} catch (Exception e) {
 					e.printStackTrace();
 				}
@@ -134,11 +176,16 @@ public class Connection extends Thread {
 
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
+            		this.callbackContext.error(this.buildKey+" did not connect: unknown host");
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
+            		this.callbackContext.error(this.buildKey+" did not connect: io host");
 			e1.printStackTrace();
-		}
+		} catch (Exception el) {
+		        this.callbackContext.error(this.buildKey+" did not connect: unknown error");
+            		el.printStackTrace();
+        	}
 
 	}
 
