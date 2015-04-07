@@ -99,7 +99,6 @@ public class SocketPlugin extends CordovaPlugin {
 				if (this.pool.get(key) == null) {
 					socket = new Connection(this, host, port, callbackContext, key);
 					socket.start();
-					this.pool.put(key, socket);
 				}
 
 				// adding to pool
@@ -294,5 +293,11 @@ public class SocketPlugin extends CordovaPlugin {
         pool.remove(buildKey);
 
         this.sendEvent(receiveHook);
+    }
+
+    public synchronized void sendConnectedEvent (String key, String ip, int port, Connection socket) {
+        this.pool.put(key, socket);
+
+        //TODO trigger an event later when needed
     }
 }

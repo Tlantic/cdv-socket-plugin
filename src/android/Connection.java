@@ -148,8 +148,10 @@ public class Connection extends Thread {
 		// creating connection
 		try {
             Log.d("now", "Initiating connection to socket");
+            //This is a bad practice. should be using handlers to send this to SocketPlugin
 			this.callbackSocket = new Socket();
             this.callbackSocket.connect(new InetSocketAddress(this.host, this.port), 20000);
+            this.hook.sendConnectedEvent(this.buildKey, this.host, this.port, this);
             this.callbackContext.success(this.buildKey);
             Log.d("now", "Connected to socket");
             this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
