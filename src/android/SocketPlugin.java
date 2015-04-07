@@ -31,7 +31,6 @@ public class SocketPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
-		System.out.println("Skandha");
 		if (action.equals("connect")) {
 			this.connect(args, callbackContext);
 			return true;
@@ -92,7 +91,7 @@ public class SocketPlugin extends CordovaPlugin {
 				// preparing parameters
 				host = args.getString(0);
 				port = args.getInt(1);
-				System.out.println("trying to connect to host: "+host+", "+port);
+				Log.d("connection", "trying to connect to host: "+host+", "+port);
 				key = this.buildKey(host, port);
 
 				// creating connection
