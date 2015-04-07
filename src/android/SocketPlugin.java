@@ -31,6 +31,7 @@ public class SocketPlugin extends CordovaPlugin {
 	@Override
 	public boolean execute(String action, JSONArray args, CallbackContext callbackContext) throws JSONException {
 
+		System.out.println("Skandha");
 		if (action.equals("connect")) {
 			this.connect(args, callbackContext);
 			return true;
@@ -91,6 +92,7 @@ public class SocketPlugin extends CordovaPlugin {
 				// preparing parameters
 				host = args.getString(0);
 				port = args.getInt(1);
+				System.out.println("trying to connect to host: "+host+", "+port);
 				key = this.buildKey(host, port);
 
 				// creating connection
@@ -262,6 +264,17 @@ public class SocketPlugin extends CordovaPlugin {
 		callbackContext.success("All connections were closed.");
 	}
 
+    private void sendEvent(final String eventTriggerCode) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                webView.loadUrl("javascript:" + eventTriggerCode);
+            }
+
+        });
+    }
+
 
 	/**
 	 * Callback for Connection object data receive. Relay information to javascript object method: window.tlantic.plugins.socket.receive();
@@ -273,13 +286,13 @@ public class SocketPlugin extends CordovaPlugin {
 	public synchronized void sendMessage(String host, int port, String chunk) {
 		final String receiveHook = "window.tlantic.plugins.socket.receive(\"" + host + "\"," + port + ",\"" + this.buildKey(host, port) + "\",\"" + chunk.replace("\"", "\\\"") + "\");";
 		
-		cordova.getActivity().runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				webView.loadUrl("javascript:" + receiveHook);
-			}
-			
-		});
+        this.sendEvent(receiveHook);
 	}
+
+    public synchronized void sendDisconnectedEvent(String buildKey) {
+        final String receiveHook = "window.tlantic.plugins.socket.disconnectedEvent(\"" + buildKey + "\");";
+        pool.remove(buildKey);
+
+        this.sendEvent(receiveHook);
+    }
 }

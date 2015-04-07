@@ -31,7 +31,7 @@ public class Connection extends Thread {
 	private Boolean mustClose;
 	private String host;
 	private int port;
-    private CallbackContext callbackContext;
+    private CallbackContext callbackContext; //This is a bad practice. should be using handlers to send this to Socket Plugin
     private String buildKey;
 
     public String getBuildKey() {
@@ -147,9 +147,11 @@ public class Connection extends Thread {
 
 		// creating connection
 		try {
+            Log.d("now", "Initiating connection to socket");
 			this.callbackSocket = new Socket();
             this.callbackSocket.connect(new InetSocketAddress(this.host, this.port), 20000);
             this.callbackContext.success(this.buildKey);
+            Log.d("now", "Connected to socket");
             this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
 			this.reader = new BufferedReader(new InputStreamReader(callbackSocket.getInputStream()));
 
@@ -159,6 +161,7 @@ public class Connection extends Thread {
 				try {
 
 					if (this.isConnected()) {
+                        Log.d("now", "reading......");
 						chunk = reader.readLine();
 
 						if (chunk != null) {
@@ -167,25 +170,40 @@ public class Connection extends Thread {
 							hook.sendMessage(this.host, this.port, chunk);
 						}
 					} else {
-						
-                    			}
+                        Log.d("now", "Connection closed but still running");
+                    }
 				} catch (Exception e) {
-					e.printStackTrace();
+                    //Only socket exception gets triggerred frequently
+                    //TODO close the socket
+                    //TODO this.mustClose = true
+                    Log.d("now", "connection closed");
+
+                    try {
+                        this.callbackSocket.close();
+                    } catch (Exception closeException) {
+                        closeException.printStackTrace();
+                    }
+
+                    hook.sendDisconnectedEvent(this.buildKey);
+                    this.mustClose = true;
 				}
 			}
 
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
-            		this.callbackContext.error(this.buildKey+" did not connect: unknown host");
+            this.callbackContext.error(this.buildKey+" did not connect: unknown host");
+            Log.d("now", "unknown host exception raised on connection");
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
-            		this.callbackContext.error(this.buildKey+" did not connect: io host");
+            this.callbackContext.error(this.buildKey+" did not connect: io host");
+            Log.d("now", "io exception raised on connection");
 			e1.printStackTrace();
 		} catch (Exception el) {
-		        this.callbackContext.error(this.buildKey+" did not connect: unknown error");
-            		el.printStackTrace();
-        	}
+            this.callbackContext.error(this.buildKey+" did not connect: unknown error");
+            Log.d("now", "exception raised on connection");
+            el.printStackTrace();
+        }
 
 	}
 
