@@ -181,10 +181,10 @@ public class SocketPlugin extends CordovaPlugin {
 				} else {
 				
 					// write on output stream
-					socket.write(data);
-					
-					// ending send process
-					callbackContext.success();	
+					if(socket.write(data))
+                        callbackContext.success();
+                    else
+                        callbackContext.error("Failed to send data");
 				}
 								
 			} catch (JSONException e) {

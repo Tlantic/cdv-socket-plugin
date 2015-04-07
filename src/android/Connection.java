@@ -133,8 +133,10 @@ public class Connection extends Thread {
 	 * 
 	 * @param data information to be sent
 	 */
-	public void write(String data) {
+	public boolean write(String data) {
 		this.writer.println(data);
+        this.writer.flush();
+        return !this.writer.checkError();
 	}
 
 
