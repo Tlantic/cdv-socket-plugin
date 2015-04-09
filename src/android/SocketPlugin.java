@@ -91,7 +91,6 @@ public class SocketPlugin extends CordovaPlugin {
 				// preparing parameters
 				host = args.getString(0);
 				port = args.getInt(1);
-				Log.d("connection", "trying to connect to host: "+host+", "+port);
 				key = this.buildKey(host, port);
 
 				// creating connection

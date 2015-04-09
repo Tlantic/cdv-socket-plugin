@@ -149,13 +149,11 @@ public class Connection extends Thread {
 
 		// creating connection
 		try {
-            Log.d("connection", "Initiating connection to socket");
             //This is a bad practice. should be using handlers to send this to SocketPlugin
 			this.callbackSocket = new Socket();
             this.callbackSocket.connect(new InetSocketAddress(this.host, this.port), 20000);
             this.hook.sendConnectedEvent(this.buildKey, this.host, this.port, this);
             this.callbackContext.success(this.buildKey);
-            Log.d("connection", "Connected to socket");
             this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
 			this.reader = new BufferedReader(new InputStreamReader(callbackSocket.getInputStream()));
 
@@ -165,7 +163,6 @@ public class Connection extends Thread {
 				try {
 
 					if (this.isConnected()) {
-                        Log.d("connection", "reading......");
 						chunk = reader.readLine();
 
 						if (chunk != null) {
@@ -175,8 +172,6 @@ public class Connection extends Thread {
 						}
 					}
 				} catch (Exception e) {
-                    Log.d("connection", "connection closed");
-
                     try {
                         this.callbackSocket.close();
                     } catch (Exception closeException) {
@@ -191,16 +186,13 @@ public class Connection extends Thread {
 		} catch (UnknownHostException e1) {
 			// TODO Auto-generated catch block
             this.callbackContext.error(this.buildKey+" did not connect: unknown host");
-            Log.d("connection", "unknown host exception raised on connection");
 			e1.printStackTrace();
 		} catch (IOException e1) {
 			// TODO Auto-generated catch block
             this.callbackContext.error(this.buildKey+" did not connect: io host");
-            Log.d("connection", "io exception raised on connection");
 			e1.printStackTrace();
 		} catch (Exception el) {
             this.callbackContext.error(this.buildKey+" did not connect: unknown error");
-            Log.d("connection", "exception raised on connection");
             el.printStackTrace();
         }
 
