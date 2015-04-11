@@ -223,6 +223,9 @@ public class SocketPlugin extends CordovaPlugin {
 					
 					// removing from pool
 					pool.remove(key);
+
+                    //Triggering event
+                    this.sendDisconnectedEvent(key);
 				}
 
 				// ending with success
@@ -256,6 +259,9 @@ public class SocketPlugin extends CordovaPlugin {
 			
 			// removing from pool
 			this.pool.remove(pairs.getKey());
+
+            //Triggering event
+            this.sendDisconnectedEvent(pairs.getKey());
 		}
 		
 		callbackContext.success("All connections were closed.");
