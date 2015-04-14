@@ -6,6 +6,7 @@ function Socket(){
     'use strict';
 
     this.receiveHookName = 'SOCKET_RECEIVE_DATA_HOOK';      // *** Event name to act as "hook" for data receiving
+    this.disconnectedHookName = 'SOCKET_DISCONNECTED';
     this.pluginRef = 'Socket';                              // *** Plugin reference for Cordova.exec calls
 }
 
@@ -57,4 +58,18 @@ Socket.prototype.receive = function (host, port, connectionId, chunk) {
 
     document.dispatchEvent(evReceive);
 };
+
+Socket.prototype.disconnectedEvent = function(connectionId) {
+    var evReceive = document.createEvent('Events');
+
+    evReceive.initEvent(this.disconnectedHookName, true, true);
+    evReceive.metadata = {
+        connection: {
+            id: connectionId
+        }
+    };
+
+    document.dispatchEvent(evReceive);
+};
+
 module.exports = new Socket();

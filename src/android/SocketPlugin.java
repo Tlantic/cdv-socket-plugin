@@ -95,13 +95,12 @@ public class SocketPlugin extends CordovaPlugin {
 
 				// creating connection
 				if (this.pool.get(key) == null) {
-					socket = new Connection(this, host, port);
+					socket = new Connection(this, host, port, callbackContext, key);
 					socket.start();
-					this.pool.put(key, socket);
 				}
 
 				// adding to pool
-				callbackContext.success(key);
+//				callbackContext.success(key);
 
 			} catch (JSONException e) {
 				callbackContext.error("Invalid parameters for 'connect' action: " + e.getMessage());
@@ -180,10 +179,10 @@ public class SocketPlugin extends CordovaPlugin {
 				} else {
 				
 					// write on output stream
-					socket.write(data);
-					
-					// ending send process
-					callbackContext.success();	
+					if(socket.write(data))
+                        callbackContext.success();
+                    else
+                        callbackContext.error("Failed to send data");
 				}
 								
 			} catch (JSONException e) {
@@ -224,6 +223,9 @@ public class SocketPlugin extends CordovaPlugin {
 					
 					// removing from pool
 					pool.remove(key);
+
+                    //Triggering event
+                    this.sendDisconnectedEvent(key);
 				}
 
 				// ending with success
@@ -257,10 +259,24 @@ public class SocketPlugin extends CordovaPlugin {
 			
 			// removing from pool
 			this.pool.remove(pairs.getKey());
+
+            //Triggering event
+            this.sendDisconnectedEvent(pairs.getKey());
 		}
 		
 		callbackContext.success("All connections were closed.");
 	}
+
+    private void sendEvent(final String eventTriggerCode) {
+        cordova.getActivity().runOnUiThread(new Runnable() {
+
+            @Override
+            public void run() {
+                webView.loadUrl("javascript:" + eventTriggerCode);
+            }
+
+        });
+    }
 
 
 	/**
@@ -273,14 +289,19 @@ public class SocketPlugin extends CordovaPlugin {
 	public synchronized void sendMessage(String host, int port, String chunk) {
 		final String receiveHook = "window.tlantic.plugins.socket.receive(\"" + host + "\"," + port + ",\"" + this.buildKey(host, port) + "\",\"" + chunk.replace("\"", "\\\"") + "\");";
 		
-		cordova.getActivity().runOnUiThread(new Runnable() {
-
-			@Override
-			public void run() {
-				webView.loadUrl("javascript:" + receiveHook);
-			}
-			
-		});
+        this.sendEvent(receiveHook);
 	}
-	
+
+    public synchronized void sendDisconnectedEvent(String buildKey) {
+        final String receiveHook = "window.tlantic.plugins.socket.disconnectedEvent(\"" + buildKey + "\");";
+        pool.remove(buildKey);
+
+        this.sendEvent(receiveHook);
+    }
+
+    public synchronized void sendConnectedEvent (String key, String ip, int port, Connection socket) {
+        this.pool.put(key, socket);
+
+        //TODO trigger an event later when needed
+    }
 }
