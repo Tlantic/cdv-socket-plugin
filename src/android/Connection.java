@@ -118,7 +118,7 @@ public class Connection extends Thread {
 	 * @see java.lang.Thread#run()
 	 */
 	public void run() {
-		String chunk = null;
+    byte[] chunk = new byte[512];
 
 		// creating connection
 		try {
@@ -133,12 +133,12 @@ public class Connection extends Thread {
 				try {
 
 					if (this.isConnected()) {
-						chunk = reader.readLine();
+            int bytesRead = callbackSocket.getInputStream().read(chunk);
+            byte[] line = new byte[bytesRead];
+            System.arraycopy(chunk, 0, line, 0, bytesRead);
 
-						if (chunk != null) {
-							chunk = chunk.replaceAll("\"\"", "null");
-							System.out.print("## RECEIVED DATA: " + chunk);
-							hook.sendMessage(this.host, this.port, chunk);
+						if (bytesRead > 0) {
+							hook.sendMessage(this.host, this.port, line);
 						}
 					}
 				} catch (Exception e) {

@@ -2,6 +2,8 @@ package com.tlantic.plugins.socket;
 
 import android.annotation.SuppressLint;
 
+import android.util.Base64;
+
 import java.io.IOException;
 
 import java.util.HashMap;
@@ -293,55 +295,55 @@ public class SocketPlugin extends CordovaPlugin {
 			} catch (JSONException e) {
 				callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
 			}
-		}		
+		}
 	}
 
 	/**
 	 * Closes all existing connections
-	 * 
+	 *
 	 * @param callbackContext
 	 */
 	private void disconnectAll (CallbackContext callbackContext) {
 		// building iterator
 		Iterator<Entry<String, Connection>> it = this.pool.entrySet().iterator();
-		
+
 		while( it.hasNext() ) {
-			
+
 			// retrieving object
 			Map.Entry<String, Connection> pairs = (Entry<String, Connection>) it.next();
 			Connection socket = pairs.getValue();
-			
+
 			// checking connection
 			if (socket.isConnected()) {
 				socket.close();
 			}
-			
+
 			// removing from pool
 			this.pool.remove(pairs.getKey());
 		}
-		
+
 		callbackContext.success("All connections were closed.");
 	}
 
 
 	/**
 	 * Callback for Connection object data receive. Relay information to javascript object method: window.tlantic.plugins.socket.receive();
-	 * 
+	 *
 	 * @param host
 	 * @param port
 	 * @param chunk
 	 */
-	public synchronized void sendMessage(String host, int port, String chunk) {
-		final String receiveHook = "window.tlantic.plugins.socket.receive(\"" + host + "\"," + port + ",\"" + this.buildKey(host, port) + "\",\"" + chunk.replace("\"", "\\\"") + "\");";
-		
+	public synchronized void sendMessage(String host, int port, byte[] chunk) {
+		final String receiveHook = "window.tlantic.plugins.socket.receive(\"" + host + "\"," + port + ",\"" + this.buildKey(host, port) + "\",\"" + Base64.encodeToString(chunk, Base64.URL_SAFE) + "\");";
+
 		cordova.getActivity().runOnUiThread(new Runnable() {
 
 			@Override
 			public void run() {
 				webView.loadUrl("javascript:" + receiveHook);
 			}
-			
+
 		});
 	}
-	
+
 }
