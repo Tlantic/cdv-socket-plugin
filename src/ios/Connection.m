@@ -74,12 +74,13 @@
         // Data receiving
         case NSStreamEventHasBytesAvailable:
             if (theStream == reader) {
-                /* uint8_t buffer[512]; */
                 void* buffer = malloc(512);
                 NSData *sharedData = [[NSData alloc] initWithBytesNoCopy:buffer length:512 freeWhenDone:YES];
                 NSInteger len;
 
                 while ([reader hasBytesAvailable]) {
+                    // This has a tendency to not fully read the packet,
+                    // requiring subsequent combination of values
                     len = [reader read : buffer maxLength : sizeof(buffer)];
 
                     NSData *line = [sharedData subdataWithRange:NSMakeRange(0, len)];

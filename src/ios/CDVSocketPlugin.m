@@ -376,7 +376,7 @@
                                 resultWithStatus : CDVCommandStatus_ERROR
                                 messageAsString  : @"Invalid connection with host."];
                 } else {
-                    // Writting on output stream
+                    // Writing on output stream
                     data = [command.arguments objectAtIndex : 1];
 
                     NSMutableData *buf = [[NSMutableData alloc] init];
