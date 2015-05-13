@@ -87,7 +87,6 @@
                     if (len > 0) {
 
                         if (nil != line) {
-                            NSLog(@"Received data: %@", line);
                             [_hook sendMessage : _host : _port : line];
                         }
                     }

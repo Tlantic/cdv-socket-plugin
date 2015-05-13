@@ -415,7 +415,7 @@
     NSString *receiveHook = [NSString stringWithFormat : @"window.tlantic.plugins.socket.receive('%@', %d, '%@', window.atob('%@') );",
                                 host, port, [self buildKey : host : port], base64Encoded];
 
-    [self writeJavascript:receiveHook];
+    [self.commandDelegate evalJs : receiveHook];
 }
 
 @end
