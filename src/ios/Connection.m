@@ -75,21 +75,27 @@
         case NSStreamEventHasBytesAvailable:
             if (theStream == reader) {
                 void* buffer = malloc(512);
-                NSData *sharedData = [[NSData alloc] initWithBytesNoCopy:buffer length:512 freeWhenDone:YES];
-                NSInteger len;
+                NSInteger len = 0;
+                NSMutableData *packet = [[NSMutableData alloc] init];
+                NSData *line;
+                NSInteger totalLength = 0;
 
                 while ([reader hasBytesAvailable]) {
-                    // This has a tendency to not fully read the packet,
+                    // NSInputStream is notorious for not fully reading a whole TCP packet,
                     // requiring subsequent combination of values
                     len = [reader read : buffer maxLength : sizeof(buffer)];
 
-                    NSData *line = [sharedData subdataWithRange:NSMakeRange(0, len)];
+                    // copy the bytes to the mutable buffer and update the total length
+                    [packet appendBytes : buffer length:len];
+                    totalLength = totalLength + len;
 
-                    if (len > 0) {
+                    line = [packet subdataWithRange:NSMakeRange(0, totalLength)];
+                }
 
-                        if (nil != line) {
-                            [_hook sendMessage : _host : _port : line];
-                        }
+                // now that no more bytes are available, send the packet
+                if (len >= 0) {
+                    if (nil != line) {
+                        [_hook sendMessage : _host : _port : line];
                     }
                 }
             }
