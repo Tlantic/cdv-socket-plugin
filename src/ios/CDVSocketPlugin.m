@@ -332,6 +332,81 @@
     }
 }
 
+- (void) sendBinary: (CDVInvokedUrlCommand *) command {
+
+    // Validating parameters
+    if ([command.arguments count] < 2) {
+        // Triggering parameter error
+        CDVPluginResult* result = [CDVPluginResult
+                                   resultWithStatus : CDVCommandStatus_ERROR
+                                   messageAsString  : @"Missing arguments when calling 'sendBinary' action."];
+
+        [self.commandDelegate
+            sendPluginResult : result
+            callbackId:command.callbackId
+         ];
+
+    } else {
+
+        // Running in background to avoid thread locks
+        [self.commandDelegate runInBackground : ^{
+
+            CDVPluginResult* result= nil;
+            Connection* socket = nil;
+            NSData* data = nil;
+            NSString* key = nil;
+
+            @try {
+                // Preparing parameters
+                key = [command.arguments objectAtIndex : 0];
+
+                // Getting connection from pool
+                socket = [pool objectForKey : key];
+
+                // Checking if socket was not found and his conenctivity
+                if (socket == nil) {
+                    NSLog(@"Connection not found");
+                    result = [CDVPluginResult
+                              resultWithStatus : CDVCommandStatus_ERROR
+                              messageAsString  : @"No connection found with host."];
+
+                } else if (![socket isConnected]) {
+                    NSLog(@"Socket is not connected.");
+                    result = [CDVPluginResult
+                                resultWithStatus : CDVCommandStatus_ERROR
+                                messageAsString  : @"Invalid connection with host."];
+                } else {
+                    // Writting on output stream
+                    data = [command.arguments objectAtIndex : 1];
+
+                    /* void* buffer = malloc(512); */
+                    /* nsdata *shareddata = [[nsdata alloc] initwithbytesnocopy:buffer length:512 freewhendone:yes]; */
+
+
+
+                    //NSLog(@"Sending data to %@ - %@", key, data);
+
+                    [socket writeBinary:data];
+
+                    // Formatting success response
+                    result = [CDVPluginResult
+                              resultWithStatus : CDVCommandStatus_OK
+                              messageAsString : key];
+                }
+            }
+            @catch (NSException *exception) {
+                NSLog(@"Exception: %@", exception);
+                result = [CDVPluginResult
+                          resultWithStatus : CDVCommandStatus_ERROR
+                          messageAsString  : @"Unexpected exception when executon 'sendBinary' action."];
+            }
+
+            // Returning callback resolution
+            [self.commandDelegate sendPluginResult : result callbackId : command.callbackId];
+        }];
+    }
+}
+
 - (void) sendMessage :(NSString *)host :(int)port :(NSData *)chunk {
     NSString *base64Encoded = [chunk base64EncodedStringWithOptions:0];
 
