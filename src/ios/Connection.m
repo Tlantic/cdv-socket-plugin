@@ -74,17 +74,19 @@
         // Data receiving
         case NSStreamEventHasBytesAvailable:
             if (theStream == reader) {
-                uint8_t buffer[512];
+                /* uint8_t buffer[512]; */
+                void* buffer = malloc(512);
+                NSData *sharedData = [[NSData alloc] initWithBytesNoCopy:buffer length:512 freeWhenDone:YES];
                 NSInteger len;
 
                 while ([reader hasBytesAvailable]) {
                     len = [reader read : buffer maxLength : sizeof(buffer)];
 
-                    NSData *line = [buffer subdataWithRange:NSMakeRange(0, len)];
+                    NSData *line = [sharedData subdataWithRange:NSMakeRange(0, len)];
 
                     if (len > 0) {
 
-                        if (nil != chunk) {
+                        if (nil != line) {
                             NSLog(@"Received data: %@", line);
                             [_hook sendMessage : _host : _port : line];
                         }

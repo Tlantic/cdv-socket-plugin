@@ -333,7 +333,7 @@
 }
 
 - (void) sendMessage :(NSString *)host :(int)port :(NSData *)chunk {
-    NSString *base64Encoded = [nsdata base64EncodedStringWithOptions:0];
+    NSString *base64Encoded = [chunk base64EncodedStringWithOptions:0];
 
     // Relay to webview
     NSString *receiveHook = [NSString stringWithFormat : @"window.tlantic.plugins.socket.receive('%@', %d, '%@', window.atob('%@') );",

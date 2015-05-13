@@ -1,6 +1,6 @@
 @protocol ConnectionDelegate <NSObject>
 
-- (void) sendMessage : (NSString *) host : (int)port : (NSString *) chunk;
+- (void) sendMessage : (NSString *) host : (int)port : (NSData *) line;
 
 @end
 
