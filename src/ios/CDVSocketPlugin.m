@@ -353,7 +353,7 @@
 
             CDVPluginResult* result= nil;
             Connection* socket = nil;
-            NSData* data = nil;
+            NSArray* data = nil;
             NSString* key = nil;
 
             @try {
@@ -363,7 +363,7 @@
                 // Getting connection from pool
                 socket = [pool objectForKey : key];
 
-                // Checking if socket was not found and his conenctivity
+                // Checking if socket was not found and his connectivity
                 if (socket == nil) {
                     NSLog(@"Connection not found");
                     result = [CDVPluginResult
@@ -379,14 +379,15 @@
                     // Writting on output stream
                     data = [command.arguments objectAtIndex : 1];
 
-                    /* void* buffer = malloc(512); */
-                    /* nsdata *shareddata = [[nsdata alloc] initwithbytesnocopy:buffer length:512 freewhendone:yes]; */
+                    NSMutableData *buf = [[NSMutableData alloc] init];
 
+                    for (int i = 0; i < [data count]; i++)
+                    {
+                        int byte = [data[i] intValue];
+                        [buf appendBytes : &byte length:1];
+                    }
 
-
-                    //NSLog(@"Sending data to %@ - %@", key, data);
-
-                    [socket writeBinary:data];
+                    [socket writeBinary:buf];
 
                     // Formatting success response
                     result = [CDVPluginResult
