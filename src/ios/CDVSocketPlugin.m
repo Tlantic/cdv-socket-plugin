@@ -156,8 +156,10 @@
         if (socket) {
             [pool removeObjectForKey : key];
 
-            if ([socket isConnected])
-                [socket close];
+            // Call close on the socket whether it's connected or not, to clean
+            // up the read/write streams and event handlers so we don't leak
+            // memory
+            [socket close];
 
             socket = nil;
 
