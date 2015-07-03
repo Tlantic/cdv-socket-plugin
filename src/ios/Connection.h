@@ -1,6 +1,6 @@
 @protocol ConnectionDelegate <NSObject>
 
-- (void) sendMessage : (NSString *) host : (int)port : (NSString *) chunk;
+- (void) sendMessage : (NSString *) host : (int)port : (NSData *) line;
 
 @end
 
@@ -21,6 +21,7 @@
 - (void) open;
 - (void) close;
 - (void) write : (NSString*) data;
+- (void) writeBinary : (NSData*) chunk;
 
 - (void) stream : (NSStream *) theStream handleEvent : (NSStreamEvent) streamEvent;
 

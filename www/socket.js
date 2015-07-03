@@ -26,7 +26,7 @@ Socket.prototype.disconnectAll = function (successCallback, errorCallback) {
     'use strict';
     exec(successCallback, errorCallback, this.pluginRef, 'disconnectAll', []);
 };
-               
+
 //
 Socket.prototype.isConnected = function (connectionId, successCallback, errorCallback) {
     'use strict';
@@ -39,12 +39,18 @@ Socket.prototype.send = function (successCallback, errorCallback, connectionId, 
     exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data)]);
 };
 
+///
+Socket.prototype.sendBinary = function (successCallback, errorCallback, connectionId, data) {
+    'use strict';
+    exec(successCallback, errorCallback, this.pluginRef, 'sendBinary', [connectionId, data]);
+};
+
 //
 Socket.prototype.receive = function (host, port, connectionId, chunk) {
     'use strict';
 
     var evReceive = document.createEvent('Events');
-    
+
     evReceive.initEvent(this.receiveHookName, true, true);
     evReceive.metadata = {
         connection: {

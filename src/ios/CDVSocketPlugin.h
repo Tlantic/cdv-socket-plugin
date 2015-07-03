@@ -10,6 +10,7 @@
 -(void) disconnectAll: (CDVInvokedUrlCommand *) command;
 -(void) isConnected: (CDVInvokedUrlCommand *) command;
 -(void) send: (CDVInvokedUrlCommand *) command;
+-(void) sendBinary: (CDVInvokedUrlCommand *) command;
 
 -(BOOL) disposeConnection :(NSString *)key;
 
