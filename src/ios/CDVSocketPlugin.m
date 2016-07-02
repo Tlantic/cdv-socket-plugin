@@ -345,7 +345,14 @@
     NSString *receiveHook = [NSString stringWithFormat : @"window.tlantic.plugins.socket.receive('%@', %d, '%@', '%@' );",
                                 host, port, [self buildKey : host : port], [NSString stringWithString : data]];
     
-    [self writeJavascript:receiveHook];
+    [self.webViewEngine evaluateJavaScript:receiveHook completionHandler:^(id result, NSError *anError) {
+        if (anError) {
+            NSLog(@"ERROR: Failed to execute the receive hook for CDVSocketPlugin: %@", [anError localizedDescription]);
+        } else {
+            NSLog(@"Receive hook JS code returned with: %@", result);
+        }
+        
+    }];
 }
 
 @end
