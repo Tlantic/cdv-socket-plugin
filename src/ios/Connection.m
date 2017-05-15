@@ -30,13 +30,13 @@
     CFStreamCreatePairWithSocketToHost(NULL, (__bridge CFStringRef)_host, _port, &readStream, &writeStream);
     
     // Configuring input stream
-    reader = objc_retainedObject(readStream);
+    reader = CFBridgingRelease(readStream);
     [reader setDelegate:self];
     [reader scheduleInRunLoop:[NSRunLoop mainRunLoop] forMode:NSDefaultRunLoopMode];
     [reader open];
     
     // Configuring output stream
-    writer = objc_retainedObject(writeStream);
+    writer = CFBridgingRelease(writeStream);
     [writer setDelegate:self];
     [writer scheduleInRunLoop:[NSRunLoop currentRunLoop] forMode:NSDefaultRunLoopMode];
     [writer open];
