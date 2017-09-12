@@ -222,6 +222,7 @@
             CDVPluginResult* result= nil;
             Connection* socket = nil;
             NSString* data = nil;
+            NSString* format = nil;
             NSString* key = nil;
 
             @try {
@@ -243,7 +244,14 @@
                 } else {
                     // writting on output stream
                     data = [command.arguments objectAtIndex:1];
-                    [socket write:data];
+                    if ([command.arguments count] > 2) {
+                        format = [command.arguments objectAtIndex:2];
+                    }
+                    if ([format  isEqual: @"base64"]) {
+                        [socket writeBase64:data];
+                    } else {
+                        [socket write:data];
+                    }
 
                     //formatting success response
                     result = [CDVPluginResult resultWithStatus:CDVCommandStatus_OK messageAsString:key];

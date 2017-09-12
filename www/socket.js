@@ -28,9 +28,9 @@ Socket.prototype.disconnectAll = function (successCallback, errorCallback) {
 };
 
 //
-Socket.prototype.send = function (successCallback, errorCallback, connectionId, data) {
+Socket.prototype.send = function (successCallback, errorCallback, connectionId, data, format) {
     'use strict';
-    exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data)]);
+    exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data), format]);
 };
 
 //
