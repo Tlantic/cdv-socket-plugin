@@ -22,6 +22,7 @@
 - (void) open;
 - (void) close;
 - (void) write : (NSString*) data;
+- (void) writeBase64 : (NSString*) data;
 
 - (void) stream : (NSStream *) theStream handleEvent : (NSStreamEvent) streamEvent;
 

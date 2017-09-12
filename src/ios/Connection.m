@@ -61,6 +61,11 @@
     [writer write : [pChunk bytes] maxLength : [pChunk length]];
 }
 
+- (void) writeBase64 : (NSString *) data {
+    NSData *decodedData = [[NSData alloc] initWithBase64EncodedString:data options:0];
+    [writer write : [decodedData bytes] maxLength : [decodedData length]];
+}
+
 - (void) stream : (NSStream *) theStream handleEvent : (NSStreamEvent) streamEvent {
     switch (streamEvent) {
         case NSStreamEventOpenCompleted:
