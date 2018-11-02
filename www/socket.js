@@ -10,9 +10,9 @@ function Socket(){
 }
 
 //
-Socket.prototype.connect = function (successCallback, errorCallback, host, port) {
+Socket.prototype.connect = function (successCallback, errorCallback, host, port, charset) {
     'use strict';
-    exec(successCallback, errorCallback, this.pluginRef, 'connect', [host, port]);
+    exec(successCallback, errorCallback, this.pluginRef, 'connect', [host, port, charset]);
 };
 
 //

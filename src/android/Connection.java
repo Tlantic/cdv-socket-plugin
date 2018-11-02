@@ -3,9 +3,11 @@ package com.tlantic.plugins.socket;
 import java.io.BufferedReader;
 import java.io.IOException;
 import java.io.InputStreamReader;
+import java.io.OutputStreamWriter;
 import java.io.PrintWriter;
 import java.net.Socket;
 import java.net.UnknownHostException;
+import java.nio.charset.Charset;
 
 
 /**
@@ -24,6 +26,7 @@ public class Connection extends Thread {
 	private Boolean mustClose;
 	private String host;
 	private int port;
+	private String charset;
 
 
 	/**
@@ -73,6 +76,23 @@ public class Connection extends Thread {
 	}
 
 	/**
+	 * Get the charset name used in OutputStreamWriter
+	 * @return String return charset name if socket was instantiated with that charset
+	 */
+	public String getCharset() {
+		return this.charset;
+	}
+
+	/**
+	 * Set the charset name for create an OutputStreamWriter that uses that charset
+	 * 
+	 * @param charset String the charset to use
+	 */
+	public void setCharset(String charset) {
+		this.charset = charset;
+	}
+
+	/**
 	 * Closes socket connection. 
 	 */
 	public void close() {
@@ -110,7 +130,13 @@ public class Connection extends Thread {
 		// creating connection
 		try {
 			this.callbackSocket = new Socket(this.host, this.port);
-			this.writer = new PrintWriter(this.callbackSocket.getOutputStream(), true);
+
+			if (this.charset != null) {
+				this.writer = new PrintWriter(new OutputStreamWriter(callbackSocket.getOutputStream(), Charset.forName(this.charset)), true);
+			} else {
+				this.writer = new PrintWriter(callbackSocket.getOutputStream(), true);
+			}
+
 			this.reader = new BufferedReader(new InputStreamReader(callbackSocket.getInputStream()));
 
 			// receiving data chunk
