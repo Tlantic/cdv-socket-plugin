@@ -1,11 +1,15 @@
 package com.tlantic.plugins.socket;
 
+import android.util.Base64;
 import android.annotation.SuppressLint;
+import java.nio.ByteBuffer;
+import java.nio.CharBuffer;
 
 import java.util.HashMap;
 import java.util.Iterator;
 import java.util.Map;
 import java.util.Map.Entry;
+import java.nio.charset.Charset;
 
 import org.apache.cordova.CallbackContext;
 import org.apache.cordova.CordovaPlugin;
@@ -122,7 +126,9 @@ public class SocketPlugin extends CordovaPlugin {
 				// retrieving parameters
 				String key = args.getString(0);
 				String data = args.getString(1);
-				
+				String format = args.getString(2);
+				String charset = args.getString(3);
+
 				// getting socket
 				socket = this.pool.get(key);
 				
@@ -137,14 +143,25 @@ public class SocketPlugin extends CordovaPlugin {
 					callbackContext.error("Cannot send empty data to " + key);
 				
 				} else {
-				
+					if (format.equals("base64")) {
+						String _charset = "UTF-8";
+
+						if (charset.equals("cp1252")) {
+							_charset = "Windows-1252";
+							socket.setCharset(_charset);
+						}
+
+						byte[] decodedData = Base64.decode(data, Base64.DEFAULT);
+						CharBuffer charBuffer = Charset.forName(_charset).decode(ByteBuffer.wrap(decodedData));
+						data = String.valueOf(charBuffer);
+					}
+
 					// write on output stream
 					socket.write(data);
-					
+
 					// ending send process
-					callbackContext.success();	
+					callbackContext.success();
 				}
-								
 			} catch (JSONException e) {
 				callbackContext.error("Unexpected error sending information: " + e.getMessage());
 			}
