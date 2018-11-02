@@ -78,6 +78,7 @@ public class SocketPlugin extends CordovaPlugin {
 		String key;
 		String host;
 		int port;
+		String charset = null;
 		Connection socket;
 
 		// validating parameters
@@ -93,9 +94,18 @@ public class SocketPlugin extends CordovaPlugin {
 				port = args.getInt(1);
 				key = this.buildKey(host, port);
 
+				if (!args.isNull(2)) {
+					charset = args.getString(2);
+				}
+
 				// creating connection
 				if (this.pool.get(key) == null) {
 					socket = new Connection(this, host, port);
+
+					if (charset != null && charset.equals("cp1252")) {
+						socket.setCharset("Windows-1252");
+					}
+
 					socket.start();
 					this.pool.put(key, socket);
 				}
@@ -127,7 +137,6 @@ public class SocketPlugin extends CordovaPlugin {
 				String key = args.getString(0);
 				String data = args.getString(1);
 				String format = args.getString(2);
-				String charset = args.getString(3);
 
 				// getting socket
 				socket = this.pool.get(key);
@@ -144,15 +153,14 @@ public class SocketPlugin extends CordovaPlugin {
 				
 				} else {
 					if (format.equals("base64")) {
-						String _charset = "UTF-8";
+						String charset = socket.getCharset();
 
-						if (charset.equals("cp1252")) {
-							_charset = "Windows-1252";
-							socket.setCharset(_charset);
+						if (charset == null) {
+							charset = "UTF-8";
 						}
 
 						byte[] decodedData = Base64.decode(data, Base64.DEFAULT);
-						CharBuffer charBuffer = Charset.forName(_charset).decode(ByteBuffer.wrap(decodedData));
+						CharBuffer charBuffer = Charset.forName(charset).decode(ByteBuffer.wrap(decodedData));
 						data = String.valueOf(charBuffer);
 					}
 

@@ -76,6 +76,14 @@ public class Connection extends Thread {
 	}
 
 	/**
+	 * Get the charset name used in OutputStreamWriter
+	 * @return String return charset name if socket was instantiated with that charset
+	 */
+	public String getCharset() {
+		return this.charset;
+	}
+
+	/**
 	 * Set the charset name for create an OutputStreamWriter that uses that charset
 	 * 
 	 * @param charset String the charset to use
