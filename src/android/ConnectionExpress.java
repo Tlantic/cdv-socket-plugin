@@ -15,7 +15,7 @@ import org.apache.cordova.CallbackContext;
 
 /**
  * @author diogoqueiros
- * <p>
+ *
  * This class represents a socket connection, behaving like a thread to listen
  * a TCP port and receive data
  */
@@ -55,10 +55,10 @@ public class ConnectionExpress extends Thread {
      */
     public boolean isConnected() {
         return (
-                this.callbackSocket == null ? false : this.callbackSocket.isConnected() &&
-                        this.callbackSocket.isBound() &&
-                        !this.callbackSocket.isClosed() &&
-                        !this.callbackSocket.isOutputShutdown()
+            this.callbackSocket == null ? false : this.callbackSocket.isConnected() &&
+            this.callbackSocket.isBound() &&
+            !this.callbackSocket.isClosed() &&
+            !this.callbackSocket.isOutputShutdown()
         );
     }
 

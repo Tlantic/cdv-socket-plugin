@@ -1,6 +1,5 @@
 package com.tlantic.plugins.socket;
 
-import android.telecom.Call;
 import android.util.Base64;
 import android.annotation.SuppressLint;
 
@@ -20,7 +19,7 @@ import org.json.JSONException;
 
 /**
  * @author viniciusl
- * <p>
+ *
  * Plugin to handle TCP socket connections.
  */
 

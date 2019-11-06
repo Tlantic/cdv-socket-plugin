@@ -11,7 +11,7 @@ import java.nio.charset.Charset;
 
 /**
  * @author viniciusl
- * <p>
+ *
  * This class represents a socket connection, behaving like a thread to listen
  * a TCP port and receive data
  */
