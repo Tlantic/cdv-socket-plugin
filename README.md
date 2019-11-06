@@ -82,7 +82,7 @@ window.tlantic.plugins.socket.connect(
 );
 ```
 
-### send (successCallback, errorCallback, host, port, data)
+### send (successCallback, errorCallback, connectionId, data)
 
 Sends information and calls success callback if information was send and does not wait for any response. To check how to receive data, please see the item below.
 
@@ -97,9 +97,31 @@ window.tlantic.plugins.socket.send(
   function () {
     console.log('failed!');
   },
+  '192.168.2.5:18002',
+  'This is the data i want to send!'
+);
+```
+
+### sendExpress (successCallback, errorCallback, host, port, data, charset, format)
+
+Opens a socket connection, send data and closes connection.
+
+Example:
+
+```
+window.tlantic.plugins.socket.sendExpress(
+  function () {
+    console.log('worked!');
+  },
+
+  function () {
+    console.log('failed!');
+  },
   '192.168.2..5',
   18002,
-  'This is the data i want to send!'
+  'This is the data i want to send!',
+  'Windows-1252', // optional
+  'base64' // optional
 );
 ```
 
