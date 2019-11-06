@@ -1,33 +1,33 @@
 {
-    "name":"cdv-socket-plugin",
-    "version":"0.4.1",
-    "description":"cdv-socket-plugin",
-    "cordova":{
-        "id":"com.tlantic.cdv-socket-plugin",
-        "platforms":[
-            "ios",
-            "android",
-            "wp8"
-        ]
-    },
-    "repository":{
-        "type":"git",
-        "url":"git+https://github.com/Tlantic/cdv-socket-plugin.git"
-    },
-    "keywords":[
-        "ecosystem:cordova",
-        "cordova-ios",
-        "cordova-android",
-        "cordova-wp8"
-    ],
-    "engines":{
-        "name":"cordova",
-        "version":">=3.0.0"
-    },
-    "author":"",
-    "license":"MIT",
-    "bugs":{
-        "url":"https://github.com/Tlantic/cdv-socket-plugin/issues"
-    },
-    "homepage":"https://github.com/Tlantic/cdv-socket-plugin#readme"
+  "name": "cdv-socket-plugin",
+  "version": "0.6.0",
+  "description": "cdv-socket-plugin",
+  "cordova": {
+    "id": "com.tlantic.cdv-socket-plugin",
+    "platforms": [
+      "ios",
+      "android",
+      "wp8"
+    ]
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/Tlantic/cdv-socket-plugin.git"
+  },
+  "keywords": [
+    "ecosystem:cordova",
+    "cordova-ios",
+    "cordova-android",
+    "cordova-wp8"
+  ],
+  "engines": {
+    "name": "cordova",
+    "version": ">=3.0.0"
+  },
+  "author": "",
+  "license": "MIT",
+  "bugs": {
+    "url": "https://github.com/Tlantic/cdv-socket-plugin/issues"
+  },
+  "homepage": "https://github.com/Tlantic/cdv-socket-plugin#readme"
 }
