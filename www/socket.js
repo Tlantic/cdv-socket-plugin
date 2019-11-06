@@ -16,6 +16,18 @@ Socket.prototype.connect = function (successCallback, errorCallback, host, port,
 };
 
 //
+Socket.prototype.send = function (successCallback, errorCallback, connectionId, data, format) {
+    'use strict';
+    exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data), format]);
+};
+
+//
+Socket.prototype.sendExpress = function (successCallback, errorCallback, host, port, data, charset, format) {
+    'use strict';
+    exec(successCallback, errorCallback, this.pluginRef, 'sendExpress', [host, port, typeof data == 'string' ? data : JSON.stringify(data), charset, format]);
+};
+
+//
 Socket.prototype.disconnect = function (successCallback, errorCallback, connectionId) {
     'use strict';
     exec(successCallback, errorCallback, this.pluginRef, 'disconnect', [connectionId]);
@@ -25,12 +37,6 @@ Socket.prototype.disconnect = function (successCallback, errorCallback, connecti
 Socket.prototype.disconnectAll = function (successCallback, errorCallback) {
     'use strict';
     exec(successCallback, errorCallback, this.pluginRef, 'disconnectAll', []);
-};
-
-//
-Socket.prototype.send = function (successCallback, errorCallback, connectionId, data, format) {
-    'use strict';
-    exec(successCallback, errorCallback, this.pluginRef, 'send', [connectionId, typeof data == 'string' ? data : JSON.stringify(data), format]);
 };
 
 //
