@@ -25,6 +25,8 @@
             target-dir="src/com/tlantic/plugins/socket" />
         <source-file src="src/android/Connection.java"
             target-dir="src/com/tlantic/plugins/socket" />
+        <source-file src="src/android/ConnectionExpress.java"
+            target-dir="src/com/tlantic/plugins/socket" />
     </platform>
 
     <!-- ios -->

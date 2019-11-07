@@ -1,6 +1,5 @@
 package com.tlantic.plugins.socket;
 
-import android.telecom.Call;
 import android.util.Base64;
 
 import java.net.Socket;
