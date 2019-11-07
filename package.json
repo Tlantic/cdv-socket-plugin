@@ -1,6 +1,6 @@
 {
   "name": "cdv-socket-plugin",
-  "version": "0.6.0",
+  "version": "0.6.1",
   "description": "cdv-socket-plugin",
   "cordova": {
     "id": "com.tlantic.cdv-socket-plugin",
