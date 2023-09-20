@@ -119,7 +119,7 @@ public class ConnectionExpress extends Thread {
             // TODO Auto-generated catch block
             e.printStackTrace();
             this.socketPlugin.disconnectExpress(this.host, this.port, this.callbackContext, false);
-            this.callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
+            this.callbackContext.error("[run] Invalid parameters for 'connect' action:" + e.getMessage());
         }
     }
 

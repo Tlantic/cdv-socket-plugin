@@ -76,9 +76,11 @@ public class SocketPlugin extends CordovaPlugin {
             // closing socket
             if (socket != null) {
 
-                // checking connection
-                if (socket.isConnected()) {
-                    socket.close();
+                if(ending) {
+                    // checking connection
+                    if (socket.isConnected()) {
+                        socket.close();
+                    }
                 }
 
                 // removing from pool
@@ -90,7 +92,7 @@ public class SocketPlugin extends CordovaPlugin {
                 callbackContext.success("Disconnected!");
             }
         } catch (Exception e) {
-            callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
+            callbackContext.error("[disconnectExpress] Invalid parameters for 'connect' action:" + e.getMessage());
         }
     }
 
@@ -152,7 +154,7 @@ public class SocketPlugin extends CordovaPlugin {
                 callbackContext.success(key);
 
             } catch (JSONException e) {
-                callbackContext.error("Invalid parameters for 'connect' action: " + e.getMessage());
+                callbackContext.error("[connect] Invalid parameters for 'connect' action: " + e.getMessage());
             }
         }
     }
@@ -253,7 +255,7 @@ public class SocketPlugin extends CordovaPlugin {
                 }
             }
         } catch (Exception e) {
-            callbackContext.error("Invalid parameters for 'connect' action: " + e.getMessage());
+            callbackContext.error("[sendExpress] Invalid parameters for 'connect' action: " + e.getMessage());
         }
     }
 
@@ -295,7 +297,7 @@ public class SocketPlugin extends CordovaPlugin {
                 callbackContext.success("Disconnected from " + key);
 
             } catch (JSONException e) {
-                callbackContext.error("Invalid parameters for 'connect' action:" + e.getMessage());
+                callbackContext.error("[disconnect] Invalid parameters for 'connect' action:" + e.getMessage());
             }
         }
     }
