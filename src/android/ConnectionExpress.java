@@ -90,6 +90,7 @@ public class ConnectionExpress extends Thread {
         // creating connection
         try {
             this.callbackSocket = new Socket(this.host, this.port);
+            this.callbackSocket.setSoTimeout(30000);
 
             if (this.charset != null) {
                 this.writer = new PrintWriter(new OutputStreamWriter(callbackSocket.getOutputStream(), Charset.forName(this.charset)), true);
@@ -97,22 +98,18 @@ public class ConnectionExpress extends Thread {
                 this.writer = new PrintWriter(callbackSocket.getOutputStream(), true);
             }
 
-            if (!this.isConnected()) {
-                this.socketPlugin.disconnectExpress(this.host, this.port, this.callbackContext, false);
-                this.callbackContext.error("Socket not connected");
-            } else {
-                if (this.format != null && this.format.equals("base64")) {
-                    if (this.charset == null) {
-                        this.charset = "UTF-8";
-                    }
-
-                    byte[] decodedData = Base64.decode(this.data, Base64.DEFAULT);
-                    CharBuffer charBuffer = Charset.forName(this.charset).decode(ByteBuffer.wrap(decodedData));
-                    this.data = String.valueOf(charBuffer);
+           
+            if (this.format != null && this.format.equals("base64")) {
+                if (this.charset == null) {
+                    this.charset = "UTF-8";
                 }
 
-                this.write(this.data);
+                byte[] decodedData = Base64.decode(this.data, Base64.DEFAULT);
+                CharBuffer charBuffer = Charset.forName(this.charset).decode(ByteBuffer.wrap(decodedData));
+                this.data = String.valueOf(charBuffer);
             }
+
+            this.write(this.data);
 
             this.socketPlugin.disconnectExpress(this.host, this.port, this.callbackContext, true);
         } catch (Exception e) {
